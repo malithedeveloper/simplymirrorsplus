@@ -17,4 +17,11 @@ public abstract class MinecraftMixin {
     private void simplymirrorsplus$unload(CallbackInfo ci) { if(Minecraft.getInstance().level==null)MirrorRenderer.release(); }
     @Inject(method="close",at=@At("HEAD"),remap=false)
     private void simplymirrorsplus$close(CallbackInfo ci) { MirrorRenderer.release(); }
+    @Inject(method="tick",at=@At("TAIL"))
+    private void simplymirrorsplus$openSettings(CallbackInfo ci) {
+        while(com.malidev.simplymirrorsplus.client.MirrorSettingsScreen.KEY.consumeClick())((Minecraft)(Object)this).setScreen(new com.malidev.simplymirrorsplus.client.MirrorSettingsScreen());
+    }
+    /** Keeps render types on the redirected target while a reflection uses the Fancy path. */
+    @Inject(method="useShaderTransparency",at=@At("HEAD"),cancellable=true)
+    private static void simplymirrorsplus$fancyInReflection(CallbackInfoReturnable<Boolean> ci) { if(MirrorRenderer.redirect!=null)ci.setReturnValue(false); }
 }

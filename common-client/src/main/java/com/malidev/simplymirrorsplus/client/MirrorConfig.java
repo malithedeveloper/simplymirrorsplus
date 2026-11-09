@@ -37,7 +37,7 @@ public final class MirrorConfig {
         }
         enabled=Boolean.parseBoolean(values.getProperty("enabled",String.valueOf(enabled)));
         playersOnly=Boolean.parseBoolean(values.getProperty("playersOnly",String.valueOf(playersOnly)));
-        resolutionPercent=Math.clamp(integer(values,"resolutionPercent",resolutionPercent),MIN_RESOLUTION,MAX_RESOLUTION);
+        resolutionPercent=Math.max(MIN_RESOLUTION,Math.min(MAX_RESOLUTION,integer(values,"resolutionPercent",resolutionPercent)));
         refreshRate=nearestRate(integer(values,"refreshRate",refreshRate));
     }
 

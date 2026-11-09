@@ -1,4 +1,21 @@
 {
+  "net.minecraft.client.renderer.MultiBufferSource.BufferSource": "net.minecraft.client.renderer.IRenderTypeBuffer.Impl",
+  "net.minecraft.client.renderer.MultiBufferSource": "net.minecraft.client.renderer.IRenderTypeBuffer",
+  "net.minecraft.client.KeyMapping": "net.minecraft.client.settings.KeyBinding",
+  "net.minecraft.client.Options": "net.minecraft.client.GameSettings",
+  "net.minecraft.client.renderer.PostChain": "net.minecraft.client.shader.ShaderGroup",
+  "net.minecraft.client.gui.components.AbstractSliderButton": "net.minecraft.client.gui.widget.AbstractSlider",
+  "net.minecraft.client.gui.components.Button": "net.minecraft.client.gui.widget.button.Button",
+  "net.minecraft.client.gui.screens.Screen": "net.minecraft.client.gui.screen.Screen",
+  "net.minecraft.network.chat.CommonComponents": "net.minecraft.client.gui.DialogTexts",
+  "net.minecraft.network.chat.Component": "net.minecraft.util.text.ITextComponent",
+  "net.minecraft.network.chat.TextComponent": "net.minecraft.util.text.StringTextComponent",
+  "net.minecraft.network.chat.TranslatableComponent": "net.minecraft.util.text.TranslationTextComponent",
+  "net.minecraft.client.renderer.FogRenderer": "net.minecraft.client.renderer.FogRenderer",
+  "com.mojang.blaze3d.platform.Lighting": "net.minecraft.client.renderer.RenderHelper",
+  "net.minecraft.client.renderer.entity.EntityRenderDispatcher": "net.minecraft.client.renderer.entity.EntityRendererManager",
+  "net.minecraft.client.player.AbstractClientPlayer": "net.minecraft.client.entity.player.AbstractClientPlayerEntity",
+  "net.minecraft.util.Mth": "net.minecraft.util.math.MathHelper",
   "com.mojang.blaze3d.pipeline.RenderTarget": "net.minecraft.client.shader.Framebuffer",
   "com.mojang.blaze3d.systems.RenderSystem": "com.mojang.blaze3d.systems.RenderSystem",
   "com.mojang.blaze3d.vertex.PoseStack": "com.mojang.blaze3d.matrix.MatrixStack",
@@ -15,7 +32,6 @@
   "net.minecraft.core.BlockPos": "net.minecraft.util.math.BlockPos",
   "net.minecraft.core.Direction": "net.minecraft.util.Direction",
   "net.minecraft.core.Registry": "net.minecraft.util.registry.Registry",
-  "net.minecraft.network.chat.TranslatableComponent": "net.minecraft.util.text.TranslationTextComponent",
   "net.minecraft.world.item.BlockItem": "net.minecraft.item.BlockItem",
   "net.minecraft.world.item.CreativeModeTab": "net.minecraft.item.ItemGroup",
   "net.minecraft.world.item.Item": "net.minecraft.item.Item",
@@ -37,5 +53,6 @@
   "net.minecraft.world.level.material.Material": "net.minecraft.block.material.Material",
   "net.minecraft.world.phys.Vec3": "net.minecraft.util.math.vector.Vector3d",
   "net.minecraft.world.phys.shapes.CollisionContext": "net.minecraft.util.math.shapes.ISelectionContext",
-  "net.minecraft.world.phys.shapes.VoxelShape": "net.minecraft.util.math.shapes.VoxelShape"
+  "net.minecraft.world.phys.shapes.VoxelShape": "net.minecraft.util.math.shapes.VoxelShape",
+  "net.minecraft.client.GraphicsStatus": "net.minecraft.client.settings.GraphicsFanciness"
 }

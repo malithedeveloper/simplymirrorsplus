@@ -4,6 +4,8 @@
   "package": "com.malidev.simplymirrorsplus.client.mixin",
   "client": [
     "CameraAccessor",
+    "FrustumMixin",
+    "OptionsMixin",
     "MinecraftMixin",
     "LevelRendererAccessor",
     "LevelRendererMixin",
@@ -17,7 +19,8 @@
     "IrisShadowMixin",
     "SodiumReflectionMixin",
     "SodiumProjectionMixin",
-    "IrisFallbackMixin"
+    "IrisFallbackMixin",
+    "SodiumPlayersOnlyMixin"
   ],
   "injectors": {
     "defaultRequire": 1

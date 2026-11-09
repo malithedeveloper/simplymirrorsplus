@@ -8,15 +8,15 @@ Based on [Simply Mirrors](https://github.com/UpperMoon0/Simply-Mirrors) by NsTut
 
 ## Supported versions
 
-| Minecraft | Loaders | Features |
-| --- | --- | --- |
-| 1.21.4 | Fabric | Full: settings menu, Players Only mode, mirror-in-mirror reflections |
-| 26.1.2 | Fabric, NeoForge | Base mirrors |
-| 1.21.1 | Fabric, NeoForge | Base mirrors |
-| 1.20.1 | Fabric, Forge | Base mirrors |
-| 1.16.5 | Fabric, Forge | Base mirrors |
+| Minecraft | Loaders |
+| --- | --- |
+| 26.1.2 | Fabric, NeoForge |
+| 1.21.4 | Fabric |
+| 1.21.1 | Fabric, NeoForge |
+| 1.20.1 | Fabric, Forge |
+| 1.16.5 | Fabric, Forge |
 
-The settings, Rendering notes and Players Only mode below apply to the 1.21.4 build.
+Every version has the same features.
 
 ## Installation
 

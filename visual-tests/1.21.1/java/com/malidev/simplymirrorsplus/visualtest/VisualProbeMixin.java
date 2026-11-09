@@ -19,6 +19,9 @@ import java.nio.file.*;
 import static org.lwjgl.opengl.GL33.*;
 @Mixin(Minecraft.class)
 public abstract class VisualProbeMixin {
+    @Unique private long simplymirrorsplus$measureStart,simplymirrorsplus$measurePasses;
+    @Unique private int simplymirrorsplus$measureFrames;
+    @Unique private java.util.Properties simplymirrorsplus$feature;
     @Unique private int simplymirrorsplus$frames;
     @Unique private int simplymirrorsplus$mirrorFrames;
     @Unique private int simplymirrorsplus$scene=-1,simplymirrorsplus$sceneFrames;
@@ -75,9 +78,10 @@ public abstract class VisualProbeMixin {
         int requested=VisualScene.index(mc.gameDirectory.toPath());
         if(requested<0)return;
         if(requested==6){simplymirrorsplus$done=true;mc.stop();return;}
-        if(requested!=simplymirrorsplus$scene){simplymirrorsplus$scene=requested;simplymirrorsplus$mirrorFrames=0;simplymirrorsplus$sceneFrames=0;simplymirrorsplus$startPasses=MirrorRenderer.completedPasses;simplymirrorsplus$captured=false;simplymirrorsplus$motionPhase=0;simplymirrorsplus$cameraPhase=0;}
+        if(requested!=simplymirrorsplus$scene){simplymirrorsplus$scene=requested;simplymirrorsplus$mirrorFrames=0;simplymirrorsplus$sceneFrames=0;simplymirrorsplus$startPasses=MirrorRenderer.completedPasses;simplymirrorsplus$captured=false;simplymirrorsplus$motionPhase=0;simplymirrorsplus$cameraPhase=0;simplymirrorsplus$measureStart=0;if(requested>=10)simplymirrorsplus$applyFeature(mc);}
         simplymirrorsplus$sceneFrames++;
         if(MirrorRenderer.completedPasses>simplymirrorsplus$startPasses)simplymirrorsplus$mirrorFrames++;
+        if(requested>=10) { simplymirrorsplus$featureFrame(mc,requested);return; }
         int phase=simplymirrorsplus$mirrorFrames/20;
         float yaw=VisualScene.yaw(requested)+(phase==1?20:phase==2?-20:0);
         float base=VisualScene.pitch(requested);
@@ -167,4 +171,75 @@ public abstract class VisualProbeMixin {
         Files.write(dir.resolve("result-"+requested+".json"),json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         System.out.println("SIMPLY_MIRRORS_VISUAL_RESULT "+requested+" "+json);simplymirrorsplus$captured=true;
     }
+
+    @Unique private void simplymirrorsplus$applyFeature(Minecraft mc) throws Exception {
+        java.util.Properties values=new java.util.Properties();
+        try(java.io.InputStream in=java.nio.file.Files.newInputStream(mc.gameDirectory.toPath().resolve("visual-feature.properties"))) { values.load(in); }
+        simplymirrorsplus$feature=values;
+        com.malidev.simplymirrorsplus.client.MirrorConfig.enabled=Boolean.parseBoolean(values.getProperty("enabled","true"));
+        com.malidev.simplymirrorsplus.client.MirrorConfig.playersOnly=Boolean.parseBoolean(values.getProperty("playersOnly","false"));
+        com.malidev.simplymirrorsplus.client.MirrorConfig.resolutionPercent=Integer.parseInt(values.getProperty("resolution","100"));
+        com.malidev.simplymirrorsplus.client.MirrorConfig.refreshRate=Integer.parseInt(values.getProperty("fps","60"));
+        mc.options.framerateLimit().set(260);mc.options.enableVsync().set(false);
+        net.minecraft.client.GraphicsStatus graphics=Boolean.parseBoolean(values.getProperty("fabulous","false"))?net.minecraft.client.GraphicsStatus.FABULOUS:net.minecraft.client.GraphicsStatus.FANCY;
+        if(mc.options.graphicsMode().get()!=graphics) { mc.options.graphicsMode().set(graphics);mc.levelRenderer.allChanged(); }
+    }
+
+    @Unique private void simplymirrorsplus$featureFrame(Minecraft mc,int scene) throws Exception {
+        java.util.Properties p=simplymirrorsplus$feature;
+        java.nio.file.Path root=mc.gameDirectory.toPath();
+        float yaw=Float.parseFloat(p.getProperty("yaw"));
+        float pitch=Float.parseFloat(p.getProperty("pitch","0"));
+        double x=Double.parseDouble(p.getProperty("x")),y=Double.parseDouble(p.getProperty("y"))-1.62,z=Double.parseDouble(p.getProperty("z"));
+        mc.player.setPos(x,y,z);mc.player.xo=x;mc.player.yo=y;mc.player.zo=z;
+        mc.player.setYRot(yaw);mc.player.setXRot(pitch);mc.player.yRotO=yaw;mc.player.xRotO=pitch;mc.player.yBodyRot=yaw;mc.player.yHeadRot=yaw;
+        if(Boolean.parseBoolean(p.getProperty("menu","false"))) { simplymirrorsplus$menu(mc,root,scene);return; }
+        if(simplymirrorsplus$sceneFrames<90)return;
+        java.nio.file.Path dir=root.resolve("visual-evidence");
+        if(java.nio.file.Files.exists(dir.resolve("result-"+scene+".json")))return;
+        long now=System.nanoTime();
+        if(simplymirrorsplus$measureStart==0) {
+            while(org.lwjgl.opengl.GL11.glGetError()!=org.lwjgl.opengl.GL11.GL_NO_ERROR) { }
+            simplymirrorsplus$measureStart=now;simplymirrorsplus$measurePasses=MirrorRenderer.completedPasses;simplymirrorsplus$measureFrames=0;
+            return;
+        }
+        simplymirrorsplus$measureFrames++;
+        if(now-simplymirrorsplus$measureStart<3_000_000_000L)return;
+        double seconds=(now-simplymirrorsplus$measureStart)/1e9;
+        int error=org.lwjgl.opengl.GL11.glGetError();
+        java.nio.file.Files.createDirectories(dir);
+        VisualCapture.save(mc.getMainRenderTarget().getColorTextureId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+scene+".png"));
+        String json="{\"reflectionsPerSecond\":"+(MirrorRenderer.completedPasses-simplymirrorsplus$measurePasses)/seconds+",\"framesPerSecond\":"+simplymirrorsplus$measureFrames/seconds+",\"glError\":"+error+"}";
+        java.nio.file.Files.write(dir.resolve("result-"+scene+".json"),json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    /** Drives the real settings screen with mouse events, then checks the values reached the config. */
+    @Unique private void simplymirrorsplus$menu(Minecraft mc,java.nio.file.Path root,int scene) throws Exception {
+        java.nio.file.Path dir=root.resolve("visual-evidence");
+        if(java.nio.file.Files.exists(dir.resolve("result-"+scene+".json"))||simplymirrorsplus$sceneFrames<90)return;
+        int w=mc.getWindow().getGuiScaledWidth(),h=mc.getWindow().getGuiScaledHeight(),x=w/2-100,y=h/2-72;
+        if(simplymirrorsplus$measureStart==0) {
+            simplymirrorsplus$measureStart=1;
+            mc.setScreen(new com.malidev.simplymirrorsplus.client.MirrorSettingsScreen());
+            return;
+        }
+        if(simplymirrorsplus$measureStart!=1)return;
+        simplymirrorsplus$measureStart=2;
+        java.nio.file.Files.createDirectories(dir);
+        net.minecraft.client.gui.screens.Screen screen=mc.screen;
+        boolean enabledBefore=com.malidev.simplymirrorsplus.client.MirrorConfig.enabled,playersBefore=com.malidev.simplymirrorsplus.client.MirrorConfig.playersOnly;
+        simplymirrorsplus$click(screen,x+100,y+10);
+        simplymirrorsplus$click(screen,x+196,y+24+10);
+        simplymirrorsplus$click(screen,x+70,y+48+10);
+        int rateAtMiddle=com.malidev.simplymirrorsplus.client.MirrorConfig.refreshRate;
+        simplymirrorsplus$click(screen,x+196,y+48+10);
+        simplymirrorsplus$click(screen,x+100,y+72+10);
+        boolean key=false;
+        for(net.minecraft.client.KeyMapping mapping:mc.options.keyMappings)if(mapping.getName().equals("key.simplymirrorsplus.settings"))key=true;
+        String json="{\"enabledFlipped\":"+(enabledBefore!=com.malidev.simplymirrorsplus.client.MirrorConfig.enabled)+",\"playersFlipped\":"+(playersBefore!=com.malidev.simplymirrorsplus.client.MirrorConfig.playersOnly)+",\"resolution\":"+com.malidev.simplymirrorsplus.client.MirrorConfig.resolutionPercent+",\"rateAtMiddle\":"+rateAtMiddle+",\"rate\":"+com.malidev.simplymirrorsplus.client.MirrorConfig.refreshRate+",\"keyRegistered\":"+key+"}";
+        java.nio.file.Files.write(dir.resolve("result-"+scene+".json"),json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        screen.onClose();
+    }
+
+    @Unique private static void simplymirrorsplus$click(net.minecraft.client.gui.screens.Screen screen,double x,double y) { screen.mouseClicked(x,y,0);screen.mouseReleased(x,y,0); }
 }

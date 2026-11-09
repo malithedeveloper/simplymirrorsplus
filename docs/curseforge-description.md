@@ -6,7 +6,7 @@ Based on Simply Mirrors by NsTut. The 1.21.4 port, new features and fixes are by
 
 ## Features
 
-The 1.21.4 Fabric build has the full feature set. Builds for other versions provide the base mirrors.
+Every version has the same features.
 
 - Every face of the block reflects, and adjacent mirrors form continuous surfaces.
 - Mirrors visible inside a reflection also reflect.
@@ -14,6 +14,6 @@ The 1.21.4 Fabric build has the full feature set. Builds for other versions prov
 - Players Only mode reflects only players over the End sky, like a VRChat mirror.
 - Works with Sodium and Iris.
 
-Requires Fabric API. Client settings are stored in `config/simplymirrorsplus.properties`.
+Fabric builds require Fabric API. Client settings are stored in `config/simplymirrorsplus.properties`.
 
 Craft a mirror from eight glass blocks around an iron ingot.
