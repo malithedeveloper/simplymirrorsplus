@@ -30,14 +30,14 @@ if (stackDirectory.isPresent()) {
         // unchanged downloads local coordinates rather than editing their metadata.
         def repository = layout.buildDirectory.dir('shader-maven').get().asFile
         artifacts.eachWithIndex { artifact, index ->
-            def location = new File(repository, "dev/simplymirrors/shadertest/${artifact.project_id}/${artifact.version_id}")
+            def location = new File(repository, "dev/simplymirrorsplus/shadertest/${artifact.project_id}/${artifact.version_id}")
             location.mkdirs()
             new File(location, "${artifact.project_id}-${artifact.version_id}.jar").bytes = jars[index].bytes
-            new File(location, "${artifact.project_id}-${artifact.version_id}.pom").text = """<project><modelVersion>4.0.0</modelVersion><groupId>dev.simplymirrors.shadertest</groupId><artifactId>${artifact.project_id}</artifactId><version>${artifact.version_id}</version></project>"""
+            new File(location, "${artifact.project_id}-${artifact.version_id}.pom").text = """<project><modelVersion>4.0.0</modelVersion><groupId>dev.simplymirrorsplus.shadertest</groupId><artifactId>${artifact.project_id}</artifactId><version>${artifact.version_id}</version></project>"""
         }
-        repositories.maven { url = uri(repository); content { includeGroup 'dev.simplymirrors.shadertest' } }
+        repositories.maven { url = uri(repository); content { includeGroup 'dev.simplymirrorsplus.shadertest' } }
         dependencies {
-            artifacts.each { artifact -> runtimeOnly(project.fg.deobf("dev.simplymirrors.shadertest:${artifact.project_id}:${artifact.version_id}")) { transitive = false } }
+            artifacts.each { artifact -> runtimeOnly(project.fg.deobf("dev.simplymirrorsplus.shadertest:${artifact.project_id}:${artifact.version_id}")) { transitive = false } }
         }
         return
     }

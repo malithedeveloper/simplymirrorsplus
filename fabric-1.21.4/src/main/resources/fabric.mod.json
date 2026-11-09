@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "simply_mirrors",
+  "id": "simplymirrorsplus",
   "version": "${version}",
-  "name": "Simply Mirrors",
-  "description": "Craftable full-block frameless mirrors with live reflections on all six faces and in-game reflection settings. Original mod by NsTut. 1.21.4 port and fixes by malidev.",
+  "name": "Simply Mirrors Plus",
+  "description": "Craftable full-block frameless mirrors with live reflections, mirror-in-mirror rendering and in-game reflection settings. Based on Simply Mirrors by NsTut. 1.21.4 port and additions by malidev.",
   "authors": [
     "NsTut"
   ],
@@ -13,15 +13,15 @@
   "license": "MIT",
   "environment": "*",
   "contact": {
-    "sources": "https://github.com/malithedeveloper/Simply-Mirrors",
-    "issues": "https://github.com/malithedeveloper/Simply-Mirrors/issues"
+    "sources": "https://github.com/malithedeveloper/simplymirrorsplus",
+    "issues": "https://github.com/malithedeveloper/simplymirrorsplus/issues"
   },
   "entrypoints": {
     "main": [
-      "com.nstut.simplymirrors.fabric.SimplyMirrorsFabric"
+      "com.malidev.simplymirrorsplus.fabric.SimplyMirrorsPlusFabric"
     ],
     "client": [
-      "com.nstut.simplymirrors.fabric.SimplyMirrorsFabricClient"
+      "com.malidev.simplymirrorsplus.fabric.SimplyMirrorsPlusFabricClient"
     ]
   },
   "depends": {
@@ -31,7 +31,7 @@
     "fabric-api": "*"
   },
   "mixins": [
-    "simplymirrors.mixins.json"
+    "simplymirrorsplus.mixins.json"
   ],
-  "icon": "assets/simply_mirrors/icon.png"
+  "icon": "assets/simplymirrorsplus/icon.png"
 }

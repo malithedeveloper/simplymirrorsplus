@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.malidev.simplymirrorsplus.visualtest",
+  "refmap": "simplymirrorsplus.refmap.json",
+  "client": [
+    "VisualProbeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}

@@ -38,7 +38,7 @@ def download(artifact, cache):
     path = cache / artifact['filename']
     if path.exists() and hashlib.sha512(path.read_bytes()).hexdigest() == artifact['sha512']:
         return path
-    request = urllib.request.Request(artifact['url'], headers={'User-Agent':'SimplyMirrors-shader-tests/1.0'})
+    request = urllib.request.Request(artifact['url'], headers={'User-Agent':'SimplyMirrorsPlus-shader-tests/1.0'})
     with urllib.request.urlopen(request, timeout=120) as response:
         content = response.read()
     if hashlib.sha512(content).hexdigest() != artifact['sha512']:

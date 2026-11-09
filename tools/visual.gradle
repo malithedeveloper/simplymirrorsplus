@@ -18,11 +18,11 @@ processResources {
         def fabric = new File(destinationDir, 'fabric.mod.json')
         if (fabric.exists()) {
             def json = new groovy.json.JsonSlurper().parse(fabric)
-            json.mixins.add('simplymirrors.visual.mixins.json')
+            json.mixins.add('simplymirrorsplus.visual.mixins.json')
             fabric.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(json))
         }
         def neo = new File(destinationDir, 'META-INF/neoforge.mods.toml')
-        if (neo.exists()) neo.append('\n[[mixins]]\nconfig = "simplymirrors.visual.mixins.json"\n')
+        if (neo.exists()) neo.append('\n[[mixins]]\nconfig = "simplymirrorsplus.visual.mixins.json"\n')
 
     }
 }
@@ -32,10 +32,10 @@ if (mc == '1.16.5' && loader == 'forge') {
             taskName 'runVisualClient'
             parent project.minecraft.runs.getByName('client')
             workingDirectory project.file("run/${runName}-client")
-            property 'simplymirrors.visualPort', port
+            property 'simplymirrorsplus.visualPort', port
             jvmArgs '-Xmx1024m'
-            args '--width', '960', '--height', '540', '--mixin', 'simplymirrors.visual.mixins.json'
-            mods { simply_mirrors { source sourceSets.main } }
+            args '--width', '960', '--height', '540', '--mixin', 'simplymirrorsplus.visual.mixins.json'
+            mods { simplymirrorsplus { source sourceSets.main } }
         }
         visualServer {
             taskName 'runVisualServer'
@@ -43,7 +43,7 @@ if (mc == '1.16.5' && loader == 'forge') {
             workingDirectory project.file("run/${runName}-server")
             jvmArgs '-Xmx1024m'
             args '--nogui'
-            mods { simply_mirrors { source sourceSets.main } }
+            mods { simplymirrorsplus { source sourceSets.main } }
         }
     }
 } else if (mc == '26.1.2' && loader == 'neoforge') {
@@ -51,8 +51,8 @@ if (mc == '1.16.5' && loader == 'forge') {
         visualClient {
             client()
             gameDirectory = project.file("run/${runName}-client")
-            systemProperty 'simplymirrors.visualTest', 'true'
-            systemProperty 'simplymirrors.visualPort', port
+            systemProperty 'simplymirrorsplus.visualTest', 'true'
+            systemProperty 'simplymirrorsplus.visualPort', port
             jvmArguments.addAll '-Xmx1024m'
             programArguments.addAll '--width', '960', '--height', '540'
         }
@@ -68,8 +68,8 @@ if (mc == '1.16.5' && loader == 'forge') {
         visualClient {
             client()
             runDir("run/${runName}-client")
-            property 'simplymirrors.visualTest', 'true'
-            property 'simplymirrors.visualPort', port
+            property 'simplymirrorsplus.visualTest', 'true'
+            property 'simplymirrorsplus.visualPort', port
             vmArg '-Xmx2048m'
             programArgs '--width', '960', '--height', '540'
         }
@@ -80,5 +80,5 @@ if (mc == '1.16.5' && loader == 'forge') {
             programArg 'nogui'
         }
     }
-    if (loader == 'forge') loom.forge.mixinConfig('simplymirrors.visual.mixins.json')
+    if (loader == 'forge') loom.forge.mixinConfig('simplymirrorsplus.visual.mixins.json')
 }

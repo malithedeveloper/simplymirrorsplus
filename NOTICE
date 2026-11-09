@@ -1,11 +1,13 @@
-Simply Mirrors
-Copyright (c) 2026 NsTut
+Simply Mirrors Plus
 SPDX-License-Identifier: MIT
+
+Based on Simply Mirrors by NsTut (https://github.com/UpperMoon0/Simply-Mirrors).
+Copyright (c) 2026 NsTut
+
+Minecraft 1.21.4 Fabric port, reflection settings, players-only mode,
+mirror-in-mirror rendering and fixes by malidev
+(https://github.com/malithedeveloper/simplymirrorsplus).
 
 Inspired by the mirror feature in Immersive Portals CE.
 The standalone reflection renderer and planar-reflection mathematics are implemented in this project.
 No Immersive Portals runtime or source files are bundled.
-
-Original author: NsTut (https://github.com/UpperMoon0/Simply-Mirrors)
-Minecraft 1.21.4 Fabric port, reflection settings, players-only mode,
-mirror-in-mirror rendering and fixes: malidev (https://github.com/malithedeveloper/Simply-Mirrors)

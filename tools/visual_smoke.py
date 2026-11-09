@@ -46,7 +46,7 @@ def fixture(scene, enclosed=False):
     # Every block retains the same legacy facing; the other five reflections must work independently of it.
     for x in range(-1,2):
         for y in range(65,68):
-            pos=point(x,y,0);commands.append("setblock "+" ".join(map(str,pos))+" simply_mirrors:mirror[facing=north]")
+            pos=point(x,y,0);commands.append("setblock "+" ".join(map(str,pos))+" simplymirrorsplus:mirror[facing=north]")
     return commands
 
 def scene_file(client_dir,scene):
@@ -82,7 +82,7 @@ def exact(sock,size):
 class Rcon:
     def __init__(self,port):
         self.sock=socket.create_connection(("127.0.0.1",port),timeout=5)
-        self.packet(3,"simply-mirrors-disposable-test")
+        self.packet(3,"simplymirrorsplus-disposable-test")
     def packet(self,kind,text):
         data=struct.pack("<ii",17,kind)+text.encode()+b"\0\0"
         self.sock.sendall(struct.pack("<i",len(data))+data)
@@ -409,7 +409,7 @@ def main():
     port=free_port();rcon_port=free_port();server_dir=module/f"run/{run_name}-server";server_dir.mkdir(parents=True,exist_ok=True)
     if (server_dir/"visual-world").exists():raise SystemExit("Existing test world found; use a fresh checkout or preserve/rename the old test world before retrying")
     (server_dir/"eula.txt").write_text("eula=true\n")
-    props={"server-ip":"127.0.0.1","server-port":port,"enable-rcon":"true","rcon.port":rcon_port,"rcon.password":"simply-mirrors-disposable-test","online-mode":"false","gamemode":"creative","force-gamemode":"true","allow-flight":"true","spawn-protection":0,"view-distance":4,"simulation-distance":4,"level-name":"visual-world","level-type":"flat" if t["minecraft"]=="1.16.5" else "minecraft:flat","max-players":2}
+    props={"server-ip":"127.0.0.1","server-port":port,"enable-rcon":"true","rcon.port":rcon_port,"rcon.password":"simplymirrorsplus-disposable-test","online-mode":"false","gamemode":"creative","force-gamemode":"true","allow-flight":"true","spawn-protection":0,"view-distance":4,"simulation-distance":4,"level-name":"visual-world","level-type":"flat" if t["minecraft"]=="1.16.5" else "minecraft:flat","max-players":2}
     (server_dir/"server.properties").write_text("\n".join(f"{k}={v}" for k,v in props.items())+"\n")
     command=[str(cwd/"gradlew.bat")] if os.name=="nt" else ["./gradlew"]
     if t["build_root"]==".":command.append(f"-Ptarget={args.target}")
@@ -454,18 +454,18 @@ def main():
                 # CreateProcessAsUser to access the normal user desktop.
                 print("SIMPLY_MIRRORS_VISUAL_PRIVATE_DESKTOP", flush=True)
                 client_env["JAVA_TOOL_OPTIONS"]=(client_env.get("JAVA_TOOL_OPTIONS", "") +
-                                                  " -Dsimplymirrors.visualOffscreen=true").strip()
+                                                  " -Dsimplymirrorsplus.visualOffscreen=true").strip()
             if args.check_camera_motion:
                 client_env["JAVA_TOOL_OPTIONS"]=(client_env.get("JAVA_TOOL_OPTIONS","")+
-                                                   " -Dsimplymirrors.visualCheckCameraMotion=true").strip()
+                                                   " -Dsimplymirrorsplus.visualCheckCameraMotion=true").strip()
             if args.check_motion:
                 client_env["JAVA_TOOL_OPTIONS"]=(client_env.get("JAVA_TOOL_OPTIONS","")+
-                                                   " -Dsimplymirrors.visualCheckMotion=true").strip()
+                                                   " -Dsimplymirrorsplus.visualCheckMotion=true").strip()
             if args.force_stencil:
                 # Only the disposable client gets the opt-in stencil trigger.
                 # The fixture server and all production/runtime jars are untouched.
                 client_env["JAVA_TOOL_OPTIONS"]=(client_env.get("JAVA_TOOL_OPTIONS","")+
-                                                   " -Dsimplymirrors.visualForceStencil=true").strip()
+                                                   " -Dsimplymirrorsplus.visualForceStencil=true").strip()
             client=subprocess.Popen(command+[task_prefix+"runVisualClient"],cwd=cwd,stdout=client_log,
                                     stderr=subprocess.STDOUT,env=client_env,**creation)
             results={};failures={}
