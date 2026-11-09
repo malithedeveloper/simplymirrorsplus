@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "simplymirrorsplus",
+  "version": "${version}",
+  "name": "Simply Mirrors Plus",
+  "description": "Craftable full-block frameless mirrors with live reflections on all six faces and a dedicated creative tab. Based on Simply Mirrors by NsTut, maintained by malidev.",
+  "authors": [
+    "NsTut"
+  ],
+  "contributors": [
+    "malidev"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "contact": {
+    "sources": "https://github.com/malithedeveloper/simplymirrorsplus",
+    "issues": "https://github.com/malithedeveloper/simplymirrorsplus/issues"
+  },
+  "entrypoints": {
+    "main": [
+      "com.malidev.simplymirrorsplus.fabric.SimplyMirrorsPlusFabric"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "1.16.5",
+    "java": ">=8",
+    "fabric": "*"
+  },
+  "mixins": [
+    "simplymirrorsplus.mixins.json"
+  ],
+  "icon": "assets/simplymirrorsplus/icon.png"
+}

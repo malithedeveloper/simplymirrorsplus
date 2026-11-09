@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.malidev.simplymirrorsplus.client.mixin",
+  "client": [
+    "CameraAccessor",
+    "MinecraftMixin",
+    "LevelRendererAccessor",
+    "LevelRendererMixin",
+    "GameRendererMixin",
+    "IrisDepthTargetMixin",
+    "IrisFullscreenMixin",
+    "IrisTransformMixin",
+    "IrisUniformMixin",
+    "IrisFrameMixin",
+    "ReflectionCameraMixin",
+    "IrisShadowMixin",
+    "SodiumReflectionMixin",
+    "SodiumProjectionMixin",
+    "IrisFallbackMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

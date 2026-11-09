@@ -1,5 +1,5 @@
 plugins { id 'java-library' }
-java { toolchain.languageVersion = JavaLanguageVersion.of(21); withSourcesJar() }
+java { toolchain.languageVersion = JavaLanguageVersion.of(8); withSourcesJar() }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 dependencies {
     testImplementation 'junit:junit:4.13.2'
@@ -10,7 +10,7 @@ test { useJUnit(); testLogging { events 'failed', 'skipped' } }
 // Exercise the optional bridge without loading Minecraft or an OpenGL context.
 tasks.named('compileTestJava') {
     source rootProject.file('common-client/src/main/java/com/malidev/simplymirrorsplus/client/IrisCameraState.java')
-    source rootProject.file('common-1.21.4/src/main/java/com/malidev/simplymirrorsplus/client/ShaderMatrices.java')
+    source rootProject.file('common-1.21.1/src/main/java/com/malidev/simplymirrorsplus/client/ShaderMatrices.java')
 }
 
 // Run the production GL history transaction against a native, software-rendered context.
@@ -37,7 +37,7 @@ tasks.register('shaderHistoryGlTest', JavaExec) {
     dependsOn tasks.named('shaderGlTestClasses')
     classpath = sourceSets.shaderGlTest.runtimeClasspath
     mainClass = 'com.malidev.simplymirrorsplus.client.ShaderHistoryGlTest'
-    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
 }
 
 // Manual, isolated Mesa compositor baseline vs batch comparison; no Minecraft process.
@@ -46,5 +46,5 @@ tasks.register('mirrorCompositeBenchmark', JavaExec) {
     dependsOn tasks.named('shaderGlTestClasses')
     classpath = sourceSets.shaderGlTest.runtimeClasspath
     mainClass = 'com.malidev.simplymirrorsplus.client.MirrorCompositeGlBenchmark'
-    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
 }
