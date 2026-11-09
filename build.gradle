@@ -15,7 +15,8 @@ def matrix = [
     'fabric-1.20.1': [mc: '1.20.1', java: 17, loader: 'fabric', loaderVersion: '0.16.14'],
     'forge-1.20.1': [mc: '1.20.1', java: 17, loader: 'forge', loaderVersion: '1.20.1-47.4.0'],
     'fabric-1.21.1': [mc: '1.21.1', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
-    'neoforge-1.21.1': [mc: '1.21.1', java: 21, loader: 'neoforge', loaderVersion: '21.1.228']
+    'neoforge-1.21.1': [mc: '1.21.1', java: 21, loader: 'neoforge', loaderVersion: '21.1.228'],
+    'fabric-1.21.4': [mc: '1.21.4', java: 21, loader: 'fabric', loaderVersion: '0.17.2']
 ]
 subprojects { p ->
     if (p.name == 'common') return

@@ -42,6 +42,13 @@
     "build_root": "."
   },
   {
+    "target": "fabric-1.21.4",
+    "minecraft": "1.21.4",
+    "loader": "fabric",
+    "java": 21,
+    "build_root": "."
+  },
+  {
     "target": "fabric-26.1.2",
     "minecraft": "26.1.2",
     "loader": "fabric",

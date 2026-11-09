@@ -60,12 +60,16 @@ public final class GlMirrorComposite implements AutoCloseable {
     }
     /** Compatibility path: one draw per plane, with an individual quad per face. */
     public void drawBatch(int texture,int width,int height,float[] viewProjection,double eyeX,double eyeY,double eyeZ,List<MirrorSurface> surfaces) {
-        drawGeometry(texture,width,height,viewProjection,eyeX,eyeY,eyeZ,surfaces,false);
+        drawGeometry(texture,viewProjection,eyeX,eyeY,eyeZ,viewProjection,eyeX,eyeY,eyeZ,surfaces,false);
     }
     /** Merge adjacent unit faces into exact rectangle coverage; retain the full-resolution texture. */
     public void drawMergedBatch(int texture,int width,int height,float[] viewProjection,double eyeX,double eyeY,double eyeZ,List<MirrorSurface> surfaces) {
+        drawMergedBatch(texture,viewProjection,eyeX,eyeY,eyeZ,viewProjection,eyeX,eyeY,eyeZ,surfaces);
+    }
+    /** Samples an image rendered from an earlier camera pose, so it stays glued to the mirror between refreshes. */
+    public void drawMergedBatch(int texture,float[] viewProjection,double eyeX,double eyeY,double eyeZ,float[] captureViewProjection,double captureX,double captureY,double captureZ,List<MirrorSurface> surfaces) {
         if(surfaces.size()<16) {
-            drawGeometry(texture,width,height,viewProjection,eyeX,eyeY,eyeZ,surfaces,true);
+            drawGeometry(texture,viewProjection,eyeX,eyeY,eyeZ,captureViewProjection,captureX,captureY,captureZ,surfaces,true);
         } else {
             String key=surfaces.get(0).planeKey();
             CachedMesh cached=meshes.get(key);
@@ -76,10 +80,10 @@ public final class GlMirrorComposite implements AutoCloseable {
             } else {
                 meshCacheHits++;
             }
-            drawGeometry(texture,width,height,viewProjection,eyeX,eyeY,eyeZ,cached.patches,true);
+            drawGeometry(texture,viewProjection,eyeX,eyeY,eyeZ,captureViewProjection,captureX,captureY,captureZ,cached.patches,true);
         }
     }
-    private void drawGeometry(int texture,int width,int height,float[] viewProjection,double eyeX,double eyeY,double eyeZ,List<? extends MirrorGeometry> surfaces,boolean persistent) {
+    private void drawGeometry(int texture,float[] viewProjection,double eyeX,double eyeY,double eyeZ,float[] capture,double captureX,double captureY,double captureZ,List<? extends MirrorGeometry> surfaces,boolean persistent) {
         if(surfaces.isEmpty())return;
         if(program==0) initialize();
         int oldProgram=glGetInteger(GL_CURRENT_PROGRAM),oldVao=glGetInteger(GL_VERTEX_ARRAY_BINDING),oldBuffer=glGetInteger(GL_ARRAY_BUFFER_BINDING);
@@ -90,7 +94,7 @@ public final class GlMirrorComposite implements AutoCloseable {
         boolean depth=glIsEnabled(GL_DEPTH_TEST),cull=glIsEnabled(GL_CULL_FACE),blend=glIsEnabled(GL_BLEND);
         boolean depthMask=glGetBoolean(GL_DEPTH_WRITEMASK);int depthFunc=glGetInteger(GL_DEPTH_FUNC);
         try {
-            FloatBuffer vertices=vertices(Math.multiplyExact(surfaces.size(),24),persistent);
+            FloatBuffer vertices=vertices(Math.multiplyExact(surfaces.size(),42),persistent);
             for(MirrorGeometry surface:surfaces) {
                 surface.writeCorners(corners);
                 for(int index:TRIANGLE_INDICES) {
@@ -101,10 +105,14 @@ public final class GlMirrorComposite implements AutoCloseable {
                     double cz=viewProjection[2]*x+viewProjection[6]*y+viewProjection[10]*z+viewProjection[14];
                     double cw=viewProjection[3]*x+viewProjection[7]*y+viewProjection[11]*z+viewProjection[15];
                     vertices.put((float)cx).put((float)cy).put((float)(cz-cw*.00001)).put((float)cw);
+                    double sx=corners[at]-captureX,sy=corners[at+1]-captureY,sz=corners[at+2]-captureZ;
+                    vertices.put(capture[0]*(float)sx+capture[4]*(float)sy+capture[8]*(float)sz+capture[12]);
+                    vertices.put(capture[1]*(float)sx+capture[5]*(float)sy+capture[9]*(float)sz+capture[13]);
+                    vertices.put(capture[3]*(float)sx+capture[7]*(float)sy+capture[11]*(float)sz+capture[15]);
                 }
             }
             vertices.flip();glEnable(GL_DEPTH_TEST);glDepthFunc(GL_LEQUAL);glDepthMask(false);glDisable(GL_CULL_FACE);glDisable(GL_BLEND);
-            glUseProgram(program);glUniform1i(glGetUniformLocation(program,"Reflection"),0);glUniform2f(glGetUniformLocation(program,"Size"),width,height);
+            glUseProgram(program);glUniform1i(glGetUniformLocation(program,"Reflection"),0);
             glBindTexture(GL_TEXTURE_2D,texture);glBindVertexArray(vao);glBindBuffer(GL_ARRAY_BUFFER,vbo);glBufferData(GL_ARRAY_BUFFER,vertices,GL_STREAM_DRAW);
             glDrawArrays(GL_TRIANGLES,0,Math.multiplyExact(surfaces.size(),6));
         } finally {
@@ -115,14 +123,14 @@ public final class GlMirrorComposite implements AutoCloseable {
     }
     private static void set(int state,boolean enabled) { if(enabled)glEnable(state);else glDisable(state); }
     private void initialize() {
-        int vertex=shader(GL_VERTEX_SHADER,"#version 150\nin vec4 Position;void main(){gl_Position=Position;}");
-        int fragment=shader(GL_FRAGMENT_SHADER,"#version 150\nuniform sampler2D Reflection;uniform vec2 Size;out vec4 FragColor;void main(){FragColor=texture(Reflection,gl_FragCoord.xy/Size);}");
+        int vertex=shader(GL_VERTEX_SHADER,"#version 150\nin vec4 Position;in vec3 Capture;out vec3 vCapture;void main(){gl_Position=Position;vCapture=Capture;}");
+        int fragment=shader(GL_FRAGMENT_SHADER,"#version 150\nuniform sampler2D Reflection;in vec3 vCapture;out vec4 FragColor;void main(){FragColor=texture(Reflection,vCapture.xy/vCapture.z*.5+.5);}");
         int oldVao=glGetInteger(GL_VERTEX_ARRAY_BINDING),oldBuffer=glGetInteger(GL_ARRAY_BUFFER_BINDING);
         try {
-            program=glCreateProgram();glAttachShader(program,vertex);glAttachShader(program,fragment);glBindAttribLocation(program,0,"Position");glLinkProgram(program);
+            program=glCreateProgram();glAttachShader(program,vertex);glAttachShader(program,fragment);glBindAttribLocation(program,0,"Position");glBindAttribLocation(program,1,"Capture");glLinkProgram(program);
             if(glGetProgrami(program,GL_LINK_STATUS)==GL_FALSE)throw new IllegalStateException(glGetProgramInfoLog(program));
             vao=glGenVertexArrays();vbo=glGenBuffers();glBindVertexArray(vao);glBindBuffer(GL_ARRAY_BUFFER,vbo);
-            glVertexAttribPointer(0,4,GL_FLOAT,false,16,0L);glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0,4,GL_FLOAT,false,28,0L);glEnableVertexAttribArray(0);glVertexAttribPointer(1,3,GL_FLOAT,false,28,16L);glEnableVertexAttribArray(1);
         } finally { glDeleteShader(vertex);glDeleteShader(fragment);glBindBuffer(GL_ARRAY_BUFFER,oldBuffer);glBindVertexArray(oldVao); }
     }
     private static int shader(int type,String source) {

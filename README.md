@@ -2,6 +2,29 @@
 
 <img src="common-assets/src/main/resources/assets/simply_mirrors/icon.png" width="128" alt="Simply Mirrors icon">
 
+> This is a fork of [Simply Mirrors](https://github.com/UpperMoon0/Simply-Mirrors) that adds a Minecraft 1.21.4 Fabric target.
+>
+> **Original author:** NsTut. **1.21.4 port, new features and fixes:** malidev.
+
+## Minecraft 1.21.4 (Fabric)
+
+Requires [Fabric API](https://modrinth.com/mod/fabric-api). Press `M` in game to open the mirror settings; the key can be changed under Controls. Settings are stored in `config/simply_mirrors.properties`.
+
+| Setting | Values |
+| --- | --- |
+| Mirrors | On or off |
+| Resolution | 25% to 100% of the screen, in 5% steps |
+| Reflection FPS | 30, 60, 90 or 120 |
+| Players Only (End Sky) | Reflects only players, over the End sky |
+
+Mirrors visible inside a reflection now reflect too, with two rendered bounces. Deeper bounces reuse the mirror's latest image, so the block texture does not show at the cutoff. Reflections are refreshed at the selected rate and reused between refreshes, and at most two mirror planes are refreshed per frame.
+
+Limitations when an Iris shader pack is active: reflections always render at 100% resolution and a mirror seen inside a reflection shows its block texture.
+
+Build this target with `./gradlew :fabric-1.21.4:build -Ptarget=fabric-1.21.4`. The jar is written to `fabric-1.21.4/build/libs/`.
+
+## About Simply Mirrors
+
 [CurseForge description](docs/curseforge-description.md) · [Release and CurseForge setup](docs/releasing.md)
 
 A standalone Minecraft mod project for placeable mirrors that reflect the surrounding world.
@@ -10,7 +33,7 @@ Simply Mirrors provides craftable, frameless, full-block mirrors, a dedicated cr
 
 Every face of the full solid cube reflects: north, south, east, west, top, and bottom. Placement direction does not limit reflections. Adjacent mirrors form continuous surfaces, including floors and ceilings. Build your own frame using any blocks you like. Take a mirror from the Simply Mirrors tab or craft one with eight glass blocks around an iron ingot.
 
-The renderer is bounded to six visible mirror planes per frame within 32 blocks. Coplanar mirrors share a reflection render, and internal faces between neighboring mirrors are skipped. More visible planes cost additional world renders. Reflections show loaded terrain and entities; recursive mirror reflections are not supported. Shader compatibility is validated with the pinned Iris/Oculus and Complementary stacks listed below; other packs and versions are not covered by that acceptance. The 26.1.2 compositor currently targets Minecraft's OpenGL renderer.
+The renderer is bounded to six visible mirror planes per frame within 32 blocks. Coplanar mirrors share a reflection render, and internal faces between neighboring mirrors are skipped. More visible planes cost additional world renders. Reflections show loaded terrain and entities; recursive mirror reflections are only supported on the 1.21.4 target. Shader compatibility is validated with the pinned Iris/Oculus and Complementary stacks listed below; other packs and versions are not covered by that acceptance. The 26.1.2 compositor currently targets Minecraft's OpenGL renderer.
 
 ![Frameless reflections in the Fabric 26.1.2 acceptance scene](docs/images/mirror-frameless.png)
 
