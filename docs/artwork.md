@@ -1,6 +1,6 @@
 # Simply Mirrors Plus artwork
 
-Both assets were generated with the built-in image generation tool and exported at game resource sizes without painted edits. The icon keeps its generated alpha channel. The in-world texture has no frame; the reflective face is drawn live by the renderer.
+Both assets were generated with the built-in image generation tool and exported at game resource sizes without painted edits. The icon keeps its generated alpha channel. The plus badge on the icon is a pixel edit added afterwards for Simply Mirrors Plus. The in-world texture has no frame; the reflective face is drawn live by the renderer.
 
 - Texture: `common-assets/src/main/resources/assets/simplymirrorsplus/textures/block/mirror.png` (16 × 16).
 - Mod/CurseForge icon: `common-assets/src/main/resources/assets/simplymirrorsplus/icon.png` (512 × 512).
