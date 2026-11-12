@@ -18,7 +18,17 @@ public final class MirrorSettingsScreen extends Screen {
     public static final KeyMapping KEY=new KeyMapping("key.simplymirrorsplus.settings",GLFW.GLFW_KEY_M,"key.categories.misc");
     private static final int WIDTH=200,HEIGHT=20,ROW=24;
 
-    public MirrorSettingsScreen() { super(new TranslatableComponent("simplymirrorsplus.settings.title")); }
+    private final Screen parent;
+
+    public MirrorSettingsScreen() { this(null); }
+
+    /** {@code parent} is shown again when the screen closes, so it can be opened from a mod list. */
+    public MirrorSettingsScreen(Screen parent) {
+        super(new TranslatableComponent("simplymirrorsplus.settings.title"));
+        this.parent = parent;
+    }
+
+    @Override public void onClose() { minecraft.setScreen(parent); }
 
     @Override protected void init() {
         int x=width/2-WIDTH/2,y=height/2-ROW*3;
@@ -26,7 +36,7 @@ public final class MirrorSettingsScreen extends Screen {
         addButton(new StepSlider(x,y+ROW,"simplymirrorsplus.settings.resolution",resolutionSteps(),MirrorConfig.resolutionPercent,value->MirrorConfig.resolutionPercent=value));
         addButton(new StepSlider(x,y+ROW*2,"simplymirrorsplus.settings.refresh_rate",MirrorConfig.REFRESH_RATES,MirrorConfig.refreshRate,value->MirrorConfig.refreshRate=value));
         toggle(x,y+ROW*3,"simplymirrorsplus.settings.players_only",()->MirrorConfig.playersOnly,value->MirrorConfig.playersOnly=value);
-        addButton(new Button(x,y+ROW*4+8,WIDTH,HEIGHT,CommonComponents.GUI_DONE,button->onClose()));
+        addButton(new Button(x,y+ROW*4+8,WIDTH,HEIGHT,CommonComponents.GUI_DONE,button -> onClose()));
     }
 
     private void toggle(int x,int y,String label,Supplier<Boolean> getter,Consumer<Boolean> setter) {

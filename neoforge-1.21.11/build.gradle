@@ -1,0 +1,36 @@
+// Minecraft 1.21.11 builds outside the shared Gradle root, like its Fabric target.
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+def shared = new Properties()
+file('../gradle.properties').withInputStream { shared.load(it) }
+version = shared.mod_version
+group = shared.maven_group
+base { archivesName = 'simplymirrorsplus-neoforge-1.21.11' }
+repositories { mavenCentral() }
+java { toolchain.languageVersion = JavaLanguageVersion.of(21); withSourcesJar() }
+sourceSets.main.java.srcDir('../common/src/main/java')
+sourceSets.main.java.srcDir('../common-client/src/main/java')
+sourceSets.main.java.srcDir('../common-1.21.11/src/main/java')
+sourceSets.main.resources.srcDir('../common-1.21.11/src/main/resources')
+neoForge {
+    version = '21.11.48'
+    runs { client { client() }; server { server(); programArgument '--nogui' } }
+    mods { simplymirrorsplus { sourceSet sourceSets.main } }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 21 }
+processResources {
+    inputs.property 'version', project.version
+    filesMatching(['fabric.mod.json', 'META-INF/neoforge.mods.toml']) { expand version: project.version }
+}
+tasks.withType(Jar).configureEach { from('../LICENSE'); from('../NOTICE') }
+publishing { publications { mavenJava(MavenPublication) { from components.java } } }
+
+apply from: file('../tools/visual.gradle')
+
+sourceSets.main.resources.srcDir('../common-assets/src/main/resources')
+
+apply from: file('../tools/shader-runtime.gradle')

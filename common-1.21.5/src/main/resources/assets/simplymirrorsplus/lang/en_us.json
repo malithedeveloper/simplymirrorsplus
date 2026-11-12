@@ -1,0 +1,15 @@
+{
+  "block.simplymirrorsplus.mirror": "Mirror",
+  "itemGroup.simplymirrorsplus": "Simply Mirrors Plus",
+  "itemGroup.simplymirrorsplus.main": "Simply Mirrors Plus",
+  "key.categories.simplymirrorsplus": "Simply Mirrors Plus",
+  "key.simplymirrorsplus.settings": "Open Mirror Settings",
+  "simplymirrorsplus.settings.title": "Mirror Settings",
+  "simplymirrorsplus.settings.enabled": "Mirrors",
+  "simplymirrorsplus.settings.resolution": "Resolution: %s%%",
+  "simplymirrorsplus.settings.refresh_rate": "Reflection FPS: %s",
+  "simplymirrorsplus.settings.players_only": "Players Only (End Sky)",
+  "simplymirrorsplus.mode.normal": "Mirror: Normal",
+  "simplymirrorsplus.mode.players_only": "Mirror: Players Only",
+  "simplymirrorsplus.mode.off": "Mirror: Off"
+}

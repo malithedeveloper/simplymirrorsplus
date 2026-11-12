@@ -10,6 +10,8 @@ test { useJUnit(); testLogging { events 'failed', 'skipped' } }
 // Exercise the optional bridge without loading Minecraft or an OpenGL context.
 tasks.named('compileTestJava') {
     source rootProject.file('common-client/src/main/java/com/malidev/simplymirrorsplus/client/IrisCameraState.java')
+    source rootProject.file('common-client/src/main/java/com/malidev/simplymirrorsplus/client/MirrorEngine.java')
+    source rootProject.file('common-client/src/main/java/com/malidev/simplymirrorsplus/client/MirrorConfig.java')
     source rootProject.file('common-1.21.1/src/main/java/com/malidev/simplymirrorsplus/client/ShaderMatrices.java')
 }
 

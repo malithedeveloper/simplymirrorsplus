@@ -5,6 +5,7 @@
   "refmap": "simplymirrorsplus.refmap.json",
   "client": [
     "CameraAccessor",
+    "RenderTargetMixin",
     "LevelRendererAccessor",
     "OptionsMixin",
     "MinecraftMixin",

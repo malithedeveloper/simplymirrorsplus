@@ -1,0 +1,10 @@
+{
+  "pack": {
+    "description": "Simply Mirrors Plus resources",
+    "min_format": 75,
+    "max_format": [
+      94,
+      1
+    ]
+  }
+}

@@ -1,6 +1,5 @@
 package com.malidev.simplymirrorsplus.client.mixin;
 
-import com.malidev.simplymirrorsplus.client.MirrorConfig;
 import com.malidev.simplymirrorsplus.client.MirrorRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -14,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class SodiumPlayersOnlyMixin {
     @Inject(method="drawChunkLayer",at=@At("HEAD"),cancellable=true,require=0)
     private void simplymirrorsplus$noTerrainInPlayersOnly(CallbackInfo ci) {
-        if(MirrorRenderer.redirect!=null&&MirrorConfig.playersOnly)ci.cancel();
+        if(MirrorRenderer.playersOnlyPass())ci.cancel();
     }
 }

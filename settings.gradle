@@ -12,10 +12,11 @@ plugins {
 }
 rootProject.name = 'simplymirrorsplus'
 include 'common'
-def targets = ['fabric-1.16.5', 'fabric-1.20.1', 'forge-1.20.1', 'fabric-1.21.1', 'neoforge-1.21.1', 'fabric-1.21.4']
+def targets = ['fabric-1.16.5', 'fabric-1.20.1', 'forge-1.20.1', 'fabric-1.21.1', 'neoforge-1.21.1', 'fabric-1.21.4', 'neoforge-1.21.4',
+    'fabric-1.21.5', 'neoforge-1.21.5', 'fabric-1.21.8', 'neoforge-1.21.8']
 def selected = providers.gradleProperty('target').orNull
 if (selected != null && selected != 'common' && !targets.contains(selected)) {
-    throw new GradleException("Unknown legacy target: ${selected}. Use tools/build.py for the complete eight-target matrix.")
+    throw new GradleException("Unknown legacy target: ${selected}. Use tools/build.py for the complete target matrix.")
 }
 (selected == null ? targets : targets.findAll { it == selected }).each { include it }
-// Minecraft 26.1.2 uses Java 25 / Gradle 9 and independent settings in its two target directories.
+// Minecraft 1.21.11 and 26.x use Gradle 9 and independent settings in their own target directories.

@@ -27,7 +27,8 @@ def main():
             command.extend([f"-Ptarget={name}", f":{name}:build"])
         else:
             command.append("build")
-        command.extend(["--no-daemon", "--console=plain"])
+        # Release builds never need the locally cached shader development mods.
+        command.extend(["--no-daemon", "--console=plain", "-PmirrorsShaderStack=off"])
         print(f"Building {name}", flush=True)
         subprocess.run(command, cwd=cwd, check=True)
         subprocess.run([sys.executable, str(ROOT / "tools/verify_artifact.py"), name], cwd=ROOT, check=True)

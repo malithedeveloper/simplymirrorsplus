@@ -8,7 +8,7 @@ version = "${version}"
 displayName = "Simply Mirrors Plus"
 logoFile = "assets/simplymirrorsplus/icon.png"
 authors = "NsTut, malidev"
-description = "Craftable full-block frameless mirrors with live reflections on all six faces and a dedicated creative tab. Based on Simply Mirrors by NsTut, maintained by malidev."
+description = "Craftable full-block frameless mirrors with live reflections on all six faces, mirror-in-mirror rendering, per-mirror modes and in-game settings. Based on Simply Mirrors by NsTut, maintained by malidev."
 [[dependencies.simplymirrorsplus]]
 modId = "forge"
 mandatory = true

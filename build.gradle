@@ -16,7 +16,12 @@ def matrix = [
     'forge-1.20.1': [mc: '1.20.1', java: 17, loader: 'forge', loaderVersion: '1.20.1-47.4.0'],
     'fabric-1.21.1': [mc: '1.21.1', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
     'neoforge-1.21.1': [mc: '1.21.1', java: 21, loader: 'neoforge', loaderVersion: '21.1.228'],
-    'fabric-1.21.4': [mc: '1.21.4', java: 21, loader: 'fabric', loaderVersion: '0.17.2']
+    'fabric-1.21.4': [mc: '1.21.4', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
+    'neoforge-1.21.4': [mc: '1.21.4', java: 21, loader: 'neoforge', loaderVersion: '21.4.161'],
+    'fabric-1.21.5': [mc: '1.21.5', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
+    'neoforge-1.21.5': [mc: '1.21.5', java: 21, loader: 'neoforge', loaderVersion: '21.5.101'],
+    'fabric-1.21.8': [mc: '1.21.8', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
+    'neoforge-1.21.8': [mc: '1.21.8', java: 21, loader: 'neoforge', loaderVersion: '21.8.57']
 ]
 subprojects { p ->
     if (p.name == 'common') return
@@ -85,7 +90,7 @@ subprojects { p ->
 }
 tasks.register('testAllVersions') {
     group = 'verification'
-    description = 'Runs version-independent reflection contracts (shared across all eight targets).'
+    description = 'Runs version-independent reflection contracts (shared across all targets).'
     dependsOn ':common:test'
 }
 

@@ -46,7 +46,7 @@ if (mc == '1.16.5' && loader == 'forge') {
             mods { simplymirrorsplus { source sourceSets.main } }
         }
     }
-} else if (mc == '26.1.2' && loader == 'neoforge') {
+} else if (plugins.hasPlugin('net.neoforged.moddev')) {
     neoForge.runs {
         visualClient {
             client()

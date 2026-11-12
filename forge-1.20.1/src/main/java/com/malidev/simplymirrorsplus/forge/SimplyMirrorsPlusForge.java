@@ -25,7 +25,9 @@ public final class SimplyMirrorsPlusForge {
         .displayItems((parameters, output) -> output.accept(SimplyMirrorsPlusForge.MIRROR_ITEM.get())).build());
     public static final RegistryObject<BlockItem> MIRROR_ITEM = ITEMS.register("mirror", () -> new BlockItem(MIRROR.get(), new Item.Properties()));
     public static final RegistryObject<BlockEntityType<MirrorBlockEntity>> MIRROR_ENTITY = ENTITIES.register("mirror", () -> BlockEntityType.Builder.of(MirrorBlockEntity::new, MIRROR.get()).build(null));
-    public SimplyMirrorsPlusForge() { net.minecraftforge.eventbus.api.IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    public SimplyMirrorsPlusForge() {
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist.isClient()) SimplyMirrorsPlusForgeClient.register();
+        net.minecraftforge.eventbus.api.IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         MirrorContent.blockEntityType = () -> MIRROR_ENTITY.get();
         BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus); TABS.register(bus);
         SimplyMirrorsPlus.initialize();

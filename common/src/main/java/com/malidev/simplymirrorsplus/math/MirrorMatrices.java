@@ -36,16 +36,27 @@ public final class MirrorMatrices {
     /** Clip everything behind the reflective surface. Supports both OpenGL and 26.x zero-to-one depth. */
     public static float[] oblique(float[] projection, float[] reflectedView, double nx, double ny, double nz,
                                   double cx, double cy, double cz, boolean zeroToOne) {
+        return oblique(projection,reflectedView,nx,ny,nz,cx,cy,cz,zeroToOne,false);
+    }
+    /** {@code reversed}: near maps to the top of the depth range, as in Minecraft 26.2+. */
+    public static float[] oblique(float[] projection, float[] reflectedView, double nx, double ny, double nz,
+                                  double cx, double cy, double cz, boolean zeroToOne, boolean reversed) {
         float[] invView=inverse(reflectedView);
         double[] p={nx,ny,nz,-(nx*cx+ny*cy+nz*cz)-0.002};
         double[] eye=new double[4];
         for(int row=0;row<4;row++) for(int k=0;k<4;k++) eye[row]+=invView[row*4+k]*p[k];
-        double[] q=transform(inverse(projection),Math.signum(eye[0]),Math.signum(eye[1]),1,1);
+        // Frustum corner on the far plane opposite the clip plane; the new far plane passes through it.
+        double far=reversed?(zeroToOne?0:-1):1;
+        double[] q=transform(inverse(projection),Math.signum(eye[0]),Math.signum(eye[1]),far,1);
         double dot=eye[0]*q[0]+eye[1]*q[1]+eye[2]*q[2]+eye[3]*q[3];
         if(Math.abs(dot)<1e-8) return projection.clone();
         double scale=(zeroToOne?1:2)/dot;
         float[] out=projection.clone();
-        for(int col=0;col<4;col++) out[col*4+2]=(float)(eye[col]*scale-(zeroToOne?0:projection[col*4+3]));
+        for(int col=0;col<4;col++) {
+            double w=projection[col*4+3];
+            // Standard: z >= -w (or 0) becomes the plane. Reversed: z <= w becomes the plane.
+            out[col*4+2]=(float)(reversed?w-eye[col]*scale:eye[col]*scale-(zeroToOne?0:w));
+        }
         return out;
     }
 }

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "simplymirrorsplus:block/mirror"
+    },
+    "facing=east": {
+      "model": "simplymirrorsplus:block/mirror",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "simplymirrorsplus:block/mirror",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "simplymirrorsplus:block/mirror",
+      "y": 270
+    }
+  }
+}

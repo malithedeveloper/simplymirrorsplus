@@ -3,7 +3,7 @@
   "id": "simplymirrorsplus",
   "version": "${version}",
   "name": "Simply Mirrors Plus",
-  "description": "Craftable full-block frameless mirrors with live reflections on all six faces and a dedicated creative tab. Based on Simply Mirrors by NsTut, maintained by malidev.",
+  "description": "Craftable full-block frameless mirrors with live reflections on all six faces, mirror-in-mirror rendering, per-mirror modes and in-game settings. Based on Simply Mirrors by NsTut, maintained by malidev.",
   "authors": [
     "NsTut"
   ],
@@ -19,6 +19,9 @@
   "entrypoints": {
     "main": [
       "com.malidev.simplymirrorsplus.fabric.SimplyMirrorsPlusFabric"
+    ],
+    "modmenu": [
+      "com.malidev.simplymirrorsplus.fabric.ModMenuIntegration"
     ]
   },
   "depends": {

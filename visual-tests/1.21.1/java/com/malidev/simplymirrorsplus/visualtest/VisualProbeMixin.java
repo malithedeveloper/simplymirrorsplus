@@ -78,9 +78,9 @@ public abstract class VisualProbeMixin {
         int requested=VisualScene.index(mc.gameDirectory.toPath());
         if(requested<0)return;
         if(requested==6){simplymirrorsplus$done=true;mc.stop();return;}
-        if(requested!=simplymirrorsplus$scene){simplymirrorsplus$scene=requested;simplymirrorsplus$mirrorFrames=0;simplymirrorsplus$sceneFrames=0;simplymirrorsplus$startPasses=MirrorRenderer.completedPasses;simplymirrorsplus$captured=false;simplymirrorsplus$motionPhase=0;simplymirrorsplus$cameraPhase=0;simplymirrorsplus$measureStart=0;if(requested>=10)simplymirrorsplus$applyFeature(mc);}
+        if(requested!=simplymirrorsplus$scene){simplymirrorsplus$scene=requested;simplymirrorsplus$mirrorFrames=0;simplymirrorsplus$sceneFrames=0;simplymirrorsplus$startPasses=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses;simplymirrorsplus$captured=false;simplymirrorsplus$motionPhase=0;simplymirrorsplus$cameraPhase=0;simplymirrorsplus$measureStart=0;if(requested>=10)simplymirrorsplus$applyFeature(mc);}
         simplymirrorsplus$sceneFrames++;
-        if(MirrorRenderer.completedPasses>simplymirrorsplus$startPasses)simplymirrorsplus$mirrorFrames++;
+        if(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses>simplymirrorsplus$startPasses)simplymirrorsplus$mirrorFrames++;
         if(requested>=10) { simplymirrorsplus$featureFrame(mc,requested);return; }
         int phase=simplymirrorsplus$mirrorFrames/20;
         float yaw=VisualScene.yaw(requested)+(phase==1?20:phase==2?-20:0);
@@ -93,7 +93,7 @@ public abstract class VisualProbeMixin {
         mc.player.setPos(px,py,pz);mc.player.xo=px;mc.player.yo=py;mc.player.zo=pz;
         mc.player.setYRot(yaw);mc.player.setXRot(pitch);mc.player.yRotO=yaw;mc.player.xRotO=pitch;mc.player.yBodyRot=yaw;mc.player.yHeadRot=yaw;
         if(simplymirrorsplus$captured)return;
-        if((MirrorRenderer.completedPasses-simplymirrorsplus$startPasses<120||simplymirrorsplus$mirrorFrames<120)&&simplymirrorsplus$sceneFrames<1800)return;
+        if((com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$startPasses<120||simplymirrorsplus$mirrorFrames<120)&&simplymirrorsplus$sceneFrames<1800)return;
         if(Boolean.getBoolean("simplymirrorsplus.visualCheckMotion") && requested==0 && simplymirrorsplus$motionPhase!=2) {
             Path dir=mc.gameDirectory.toPath().resolve("visual-evidence");
             Files.createDirectories(dir);
@@ -106,14 +106,14 @@ public abstract class VisualProbeMixin {
                 // idle pose twice, even though reflected player rendering worked.
                 mc.player.swing(InteractionHand.MAIN_HAND);
                 simplymirrorsplus$motionStart=simplymirrorsplus$sceneFrames;
-                simplymirrorsplus$motionStartPass=MirrorRenderer.completedPasses;
+                simplymirrorsplus$motionStartPass=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses;
                 simplymirrorsplus$motionPhase=1;
                 System.out.println("SIMPLY_MIRRORS_ENTITY_SWING_STARTED");
                 return;
             }
             float attack=mc.player.getAttackAnim(0.0f);
             int elapsed=simplymirrorsplus$sceneFrames-simplymirrorsplus$motionStart;
-            long reflected=MirrorRenderer.completedPasses-simplymirrorsplus$motionStartPass;
+            long reflected=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$motionStartPass;
             // Wait for the arm to actually travel through the middle of its
             // attack animation and for the mirror to draw the advanced pose.
             // Never accept a frame counter alone as proof of player motion.
@@ -131,7 +131,7 @@ public abstract class VisualProbeMixin {
         if(cameraTest&&simplymirrorsplus$cameraPhase!=4) {
             Path dir=mc.gameDirectory.toPath().resolve("visual-evidence");
             Files.createDirectories(dir);
-            long passes=MirrorRenderer.completedPasses;
+            long passes=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses;
             if(simplymirrorsplus$cameraPhase==0) {
                 VisualCapture.save(mc.getMainRenderTarget().getColorTextureId(),
                         mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,
@@ -167,7 +167,7 @@ public abstract class VisualProbeMixin {
         boolean tab=false;for(CreativeModeTab t:BuiltInRegistries.CREATIVE_MODE_TAB)if(t!=null&&t.getDisplayName().getString().equals("Simply Mirrors Plus"))tab=true;
         int error=glGetError();Path dir=mc.gameDirectory.toPath().resolve("visual-evidence");Files.createDirectories(dir);
         VisualCapture.save(mc.getMainRenderTarget().getColorTextureId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+requested+".png"));
-        String json="{\"passes\":"+(MirrorRenderer.completedPasses-simplymirrorsplus$startPasses)+",\"angleFrames\":"+simplymirrorsplus$mirrorFrames+",\"glError\":"+error+",\"creativeTab\":"+tab+",\"shaderPackActive\":"+com.malidev.simplymirrorsplus.visualsupport.ShaderProbe.active()+",\"stencilEnabled\":"+simplymirrorsplus$stencilReady+",\"motionCaptured\":"+(requested==0&&simplymirrorsplus$motionPhase==2)+",\"cameraMotionCaptured\":"+(cameraTest&&simplymirrorsplus$cameraPhase==4)+"}";
+        String json="{\"passes\":"+(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$startPasses)+",\"angleFrames\":"+simplymirrorsplus$mirrorFrames+",\"glError\":"+error+",\"creativeTab\":"+tab+",\"shaderPackActive\":"+com.malidev.simplymirrorsplus.visualsupport.ShaderProbe.active()+",\"stencilEnabled\":"+simplymirrorsplus$stencilReady+",\"motionCaptured\":"+(requested==0&&simplymirrorsplus$motionPhase==2)+",\"cameraMotionCaptured\":"+(cameraTest&&simplymirrorsplus$cameraPhase==4)+"}";
         Files.write(dir.resolve("result-"+requested+".json"),json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         System.out.println("SIMPLY_MIRRORS_VISUAL_RESULT "+requested+" "+json);simplymirrorsplus$captured=true;
     }
@@ -200,7 +200,7 @@ public abstract class VisualProbeMixin {
         long now=System.nanoTime();
         if(simplymirrorsplus$measureStart==0) {
             while(org.lwjgl.opengl.GL11.glGetError()!=org.lwjgl.opengl.GL11.GL_NO_ERROR) { }
-            simplymirrorsplus$measureStart=now;simplymirrorsplus$measurePasses=MirrorRenderer.completedPasses;simplymirrorsplus$measureFrames=0;
+            simplymirrorsplus$measureStart=now;simplymirrorsplus$measurePasses=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses;simplymirrorsplus$measureFrames=0;
             return;
         }
         simplymirrorsplus$measureFrames++;
@@ -209,7 +209,7 @@ public abstract class VisualProbeMixin {
         int error=org.lwjgl.opengl.GL11.glGetError();
         java.nio.file.Files.createDirectories(dir);
         VisualCapture.save(mc.getMainRenderTarget().getColorTextureId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+scene+".png"));
-        String json="{\"reflectionsPerSecond\":"+(MirrorRenderer.completedPasses-simplymirrorsplus$measurePasses)/seconds+",\"framesPerSecond\":"+simplymirrorsplus$measureFrames/seconds+",\"glError\":"+error+"}";
+        String json="{\"reflectionsPerSecond\":"+(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$measurePasses)/seconds+",\"framesPerSecond\":"+simplymirrorsplus$measureFrames/seconds+",\"glError\":"+error+"}";
         java.nio.file.Files.write(dir.resolve("result-"+scene+".json"),json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 

@@ -45,9 +45,9 @@ public abstract class VisualProbeMixin {
         int requested=VisualScene.index(mc.gameDirectory.toPath());
         if(requested<0)return;
         if(requested==6){simplymirrorsplus$done=true;mc.stop();return;}
-        if(requested!=simplymirrorsplus$scene){simplymirrorsplus$scene=requested;simplymirrorsplus$mirrorFrames=0;simplymirrorsplus$sceneFrames=0;simplymirrorsplus$startPasses=MirrorRenderer.completedPasses;simplymirrorsplus$captured=false;simplymirrorsplus$measureStart=0;if(requested>=10)simplymirrorsplus$applyFeature(mc);}
+        if(requested!=simplymirrorsplus$scene){simplymirrorsplus$scene=requested;simplymirrorsplus$mirrorFrames=0;simplymirrorsplus$sceneFrames=0;simplymirrorsplus$startPasses=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses;simplymirrorsplus$captured=false;simplymirrorsplus$measureStart=0;if(requested>=10)simplymirrorsplus$applyFeature(mc);}
         simplymirrorsplus$sceneFrames++;
-        if(MirrorRenderer.completedPasses>simplymirrorsplus$startPasses)simplymirrorsplus$mirrorFrames++;
+        if(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses>simplymirrorsplus$startPasses)simplymirrorsplus$mirrorFrames++;
         if(requested>=10) { simplymirrorsplus$featureFrame(mc,requested);return; }
         int phase=simplymirrorsplus$mirrorFrames/20;
         float yaw=VisualScene.yaw(requested)+(phase==1?20:phase==2?-20:0);
@@ -57,11 +57,11 @@ public abstract class VisualProbeMixin {
         mc.player.setPos(px,py,pz);mc.player.xo=px;mc.player.yo=py;mc.player.zo=pz;
         mc.player.setYRot(yaw);mc.player.setXRot(pitch);mc.player.yRotO=yaw;mc.player.xRotO=pitch;mc.player.yBodyRot=yaw;mc.player.yHeadRot=yaw;
         if(simplymirrorsplus$captured)return;
-        if((MirrorRenderer.completedPasses-simplymirrorsplus$startPasses<120||simplymirrorsplus$mirrorFrames<120)&&simplymirrorsplus$sceneFrames<1800)return;
+        if((com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$startPasses<120||simplymirrorsplus$mirrorFrames<120)&&simplymirrorsplus$sceneFrames<1800)return;
         boolean tab=false;for(CreativeModeTab t:BuiltInRegistries.CREATIVE_MODE_TAB)if(t!=null&&t.getDisplayName().getString().equals("Simply Mirrors Plus"))tab=true;
         int error=glGetError();Path dir=mc.gameDirectory.toPath().resolve("visual-evidence");Files.createDirectories(dir);
-        VisualCapture.save(((com.mojang.blaze3d.opengl.GlTexture)mc.getMainRenderTarget().getColorTexture()).glId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+requested+".png"));
-        String json="{\"passes\":"+(MirrorRenderer.completedPasses-simplymirrorsplus$startPasses)+",\"angleFrames\":"+simplymirrorsplus$mirrorFrames+",\"glError\":"+error+",\"creativeTab\":"+tab+",\"shaderPackActive\":"+com.malidev.simplymirrorsplus.visualsupport.ShaderProbe.active()+"}";
+        VisualCapture.save(((com.mojang.blaze3d.opengl.GlTexture)com.malidev.simplymirrorsplus.client.GpuTextures.unwrap(mc.getMainRenderTarget().getColorTexture())).glId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+requested+".png"));
+        String json="{\"passes\":"+(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$startPasses)+",\"angleFrames\":"+simplymirrorsplus$mirrorFrames+",\"glError\":"+error+",\"creativeTab\":"+tab+",\"shaderPackActive\":"+com.malidev.simplymirrorsplus.visualsupport.ShaderProbe.active()+"}";
         Files.write(dir.resolve("result-"+requested+".json"),json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         System.out.println("SIMPLY_MIRRORS_VISUAL_RESULT "+requested+" "+json);simplymirrorsplus$captured=true;
     }
@@ -74,7 +74,7 @@ public abstract class VisualProbeMixin {
         com.malidev.simplymirrorsplus.client.MirrorConfig.playersOnly=Boolean.parseBoolean(values.getProperty("playersOnly","false"));
         com.malidev.simplymirrorsplus.client.MirrorConfig.resolutionPercent=Integer.parseInt(values.getProperty("resolution","100"));
         com.malidev.simplymirrorsplus.client.MirrorConfig.refreshRate=Integer.parseInt(values.getProperty("fps","60"));
-        mc.options.framerateLimit().set(260);mc.options.enableVsync().set(false);
+        mc.options.framerateLimit().set(260);mc.options.enableVsync().set(false);mc.options.inactivityFpsLimit().set(net.minecraft.client.InactivityFpsLimit.MINIMIZED);
         boolean improved=Boolean.parseBoolean(values.getProperty("fabulous","false"));
         if(mc.options.improvedTransparency().get()!=improved) { mc.options.improvedTransparency().set(improved);mc.levelRenderer.allChanged(); }
     }
@@ -94,7 +94,7 @@ public abstract class VisualProbeMixin {
         long now=System.nanoTime();
         if(simplymirrorsplus$measureStart==0) {
             while(org.lwjgl.opengl.GL11.glGetError()!=org.lwjgl.opengl.GL11.GL_NO_ERROR) { }
-            simplymirrorsplus$measureStart=now;simplymirrorsplus$measurePasses=MirrorRenderer.completedPasses;simplymirrorsplus$measureFrames=0;
+            simplymirrorsplus$measureStart=now;simplymirrorsplus$measurePasses=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses;simplymirrorsplus$measureFrames=0;
             return;
         }
         simplymirrorsplus$measureFrames++;
@@ -102,8 +102,8 @@ public abstract class VisualProbeMixin {
         double seconds=(now-simplymirrorsplus$measureStart)/1e9;
         int error=org.lwjgl.opengl.GL11.glGetError();
         java.nio.file.Files.createDirectories(dir);
-        VisualCapture.save(((com.mojang.blaze3d.opengl.GlTexture)mc.getMainRenderTarget().getColorTexture()).glId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+scene+".png"));
-        String json="{\"reflectionsPerSecond\":"+(MirrorRenderer.completedPasses-simplymirrorsplus$measurePasses)/seconds+",\"framesPerSecond\":"+simplymirrorsplus$measureFrames/seconds+",\"glError\":"+error+"}";
+        VisualCapture.save(((com.mojang.blaze3d.opengl.GlTexture)com.malidev.simplymirrorsplus.client.GpuTextures.unwrap(mc.getMainRenderTarget().getColorTexture())).glId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+scene+".png"));
+        String json="{\"reflectionsPerSecond\":"+(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$measurePasses)/seconds+",\"framesPerSecond\":"+simplymirrorsplus$measureFrames/seconds+",\"glError\":"+error+"}";
         java.nio.file.Files.write(dir.resolve("result-"+scene+".json"),json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 

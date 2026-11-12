@@ -52,6 +52,27 @@ public class MirrorMatricesTest {
         assertEquals(main[0]/main[3],mirror[0]/mirror[3],1e-6);
         assertEquals(main[1]/main[3],mirror[1]/mirror[3],1e-6);
     }
+    @Test public void reversedDepthProjectionClipsWallAndPreservesGlassAlignment() {
+        for(boolean zeroToOne:new boolean[]{true,false}) {
+            // Reversed depth: near maps to 1, far to 0 (or -1 for the OpenGL range).
+            float[] projection=PROJECTION.clone();
+            for(int col=0;col<4;col++) {
+                double z=PROJECTION[col*4+2],w=PROJECTION[col*4+3];
+                projection[col*4+2]=(float)(zeroToOne?(w-z)*.5:-z);
+            }
+            float[] view=MirrorMatrices.multiply(VIEW,ReflectionTransform.matrix(0,0,-1));
+            float[] clipped=MirrorMatrices.oblique(projection,view,0,0,-1,0,0,-3.875,zeroToOne,true);
+            float[] vp=MirrorMatrices.multiply(clipped,view);
+            double[] wall=MirrorMatrices.transform(vp,0,0,-3.25,1),room=MirrorMatrices.transform(vp,0,0,-4.75,1);
+            assertTrue("Wall fails the reversed near plane",wall[2]>wall[3]);
+            assertTrue("Room survives the reversed near plane",room[2]<room[3]);
+            assertTrue("Room is inside the far plane",room[2]>(zeroToOne?0:-room[3]));
+            double[] main=MirrorMatrices.transform(MirrorMatrices.multiply(projection,VIEW),.25,.5,3.875,1);
+            double[] mirror=MirrorMatrices.transform(vp,.25,.5,-3.875,1);
+            assertEquals(main[0]/main[3],mirror[0]/mirror[3],1e-6);
+            assertEquals(main[1]/main[3],mirror[1]/mirror[3],1e-6);
+        }
+    }
     @Test public void horizontalPlaneKeysMergeOnlyCoplanarSameFacingCells() {
         assertEquals(new MirrorSurface(0,0,0,0,-1).planeKey(),new MirrorSurface(1,1,0,0,-1).planeKey());
         assertNotEquals(new MirrorSurface(0,0,0,0,-1).planeKey(),new MirrorSurface(0,0,1,0,-1).planeKey());

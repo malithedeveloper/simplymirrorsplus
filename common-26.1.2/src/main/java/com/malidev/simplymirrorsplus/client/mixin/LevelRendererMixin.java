@@ -20,7 +20,7 @@ public abstract class LevelRendererMixin {
             ChunkSectionsToRender sections,CallbackInfo ci) {
         MirrorRenderer.render(allocator,delta,camera,view,fog,color,sky);
     }
-    @Inject(method="addCloudsPass",at=@At("HEAD"),cancellable=true)
+    @Inject(method="addCloudsPass*",at=@At("HEAD"),cancellable=true)
     private void simplymirrorsplus$skipReflectionClouds(CallbackInfo ci) { if(MirrorRenderer.redirect!=null)ci.cancel(); }
     /** Post passes keep the cull state, so the flipped winding of a reflection discards their fullscreen quad and leaves the image black. */
     @Inject(method="getTransparencyChain",at=@At("HEAD"),cancellable=true)

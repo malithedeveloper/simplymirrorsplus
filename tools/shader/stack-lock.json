@@ -369,6 +369,288 @@
         "url": "https://cdn.modrinth.com/data/AANobbMI/versions/c3YkZvne/sodium-fabric-0.6.13%2Bmc1.21.4.jar",
         "sha512": "2c72ca2ddfd27e29ff6c24fccdf6f3d80857bd1014c707017f96cb4a424f94918e53ba21d85f22e3c9171803f8d2c12c99ae857d38d8e85546cc65960b95a2f1"
       }
+    ],
+    "fabric-1.21.8": [
+      {
+        "version_id": "Rhzf61g1",
+        "project_id": "YL57xq9U",
+        "version": "1.9.6+1.21.8-fabric",
+        "game_versions": [
+          "1.21.6",
+          "1.21.7",
+          "1.21.8"
+        ],
+        "loaders": [
+          "fabric"
+        ],
+        "filename": "iris-fabric-1.9.6+mc1.21.8.jar",
+        "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/Rhzf61g1/iris-fabric-1.9.6%2Bmc1.21.8.jar",
+        "sha512": "7bbc094462fb05b008051632e944ce274ce9ad57bdcf9dd6608ed814b76e9ce530ea0ff66593ec5955899aaa46877e25e5a67dd46c4800f29419fd8c7fb531bb",
+        "dependencies": [
+          {
+            "version_id": "pJRT8Zxt",
+            "project_id": "AANobbMI",
+            "file_name": null,
+            "dependency_type": "required"
+          }
+        ]
+      },
+      {
+        "version_id": "pJRT8Zxt",
+        "project_id": "AANobbMI",
+        "version": "mc1.21.8-0.7.2-fabric",
+        "game_versions": [
+          "1.21.6",
+          "1.21.7",
+          "1.21.8"
+        ],
+        "loaders": [
+          "fabric"
+        ],
+        "filename": "sodium-fabric-0.7.2+mc1.21.8.jar",
+        "url": "https://cdn.modrinth.com/data/AANobbMI/versions/pJRT8Zxt/sodium-fabric-0.7.2%2Bmc1.21.8.jar",
+        "sha512": "bd52c2054801191f870fbca6ff3d97aca7bda7c15f0023142102b983ddd4b7454fe10f36cfbe5f7d05cd80c95b34e2a16bddf003508d0761dbb8a565c020865e",
+        "dependencies": []
+      }
+    ],
+    "fabric-1.21.11": [
+      {
+        "version_id": "ka9PDlsN",
+        "project_id": "YL57xq9U",
+        "version": "1.10.8+1.21.11-fabric",
+        "game_versions": [
+          "1.21.11"
+        ],
+        "loaders": [
+          "fabric"
+        ],
+        "filename": "iris-fabric-1.10.8+mc1.21.11.jar",
+        "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/ka9PDlsN/iris-fabric-1.10.8%2Bmc1.21.11.jar",
+        "sha512": "f0cad4b6af593b6fc25738c4ef5a2b346125f9693d25a0d486858e54798d2ea87b24d1497e1bb4391729d7d9e490f42771f7fb468d4e1420e372d8643f9e2055",
+        "dependencies": [
+          {
+            "version_id": "rkdTcxoT",
+            "project_id": "AANobbMI",
+            "file_name": null,
+            "dependency_type": "required"
+          }
+        ]
+      },
+      {
+        "version_id": "rkdTcxoT",
+        "project_id": "AANobbMI",
+        "version": "mc1.21.11-0.8.14-fabric",
+        "game_versions": [
+          "1.21.11"
+        ],
+        "loaders": [
+          "fabric"
+        ],
+        "filename": "sodium-fabric-0.8.14+mc1.21.11.jar",
+        "url": "https://cdn.modrinth.com/data/AANobbMI/versions/rkdTcxoT/sodium-fabric-0.8.14%2Bmc1.21.11.jar",
+        "sha512": "04c43f9e8534b87a52c42ffd51b0e344d4ef92dc9cc52da33d13af6a18bf74b05380d2027f1e0db982698d0aff274c42741c1e21b313b0cd75ed3af005fc98d9",
+        "dependencies": []
+      }
+    ],
+    "neoforge-1.21.4": [
+      {
+        "version_id": "FNc0XYTL",
+        "project_id": "YL57xq9U",
+        "version": "1.8.8+1.21.4-neoforge",
+        "game_versions": [
+          "1.21.4"
+        ],
+        "loaders": [
+          "neoforge"
+        ],
+        "filename": "iris-neoforge-1.8.8+mc1.21.4.jar",
+        "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/FNc0XYTL/iris-neoforge-1.8.8%2Bmc1.21.4.jar",
+        "sha512": "b1868549b3fed06bc3cf584839c646ea5cebc6f954634ae7f2f0e8619c0c6a63e61e3f453eb1eec7e556c932b2d742998bd153885b141b9005dec8160cd90c93",
+        "dependencies": [
+          {
+            "version_id": null,
+            "project_id": "AANobbMI",
+            "file_name": null,
+            "dependency_type": "required"
+          }
+        ]
+      },
+      {
+        "version_id": "XgEfENfn",
+        "project_id": "AANobbMI",
+        "version": "mc1.21.4-0.6.13-neoforge",
+        "game_versions": [
+          "1.21.4"
+        ],
+        "loaders": [
+          "neoforge"
+        ],
+        "filename": "sodium-neoforge-0.6.13+mc1.21.4.jar",
+        "url": "https://cdn.modrinth.com/data/AANobbMI/versions/XgEfENfn/sodium-neoforge-0.6.13%2Bmc1.21.4.jar",
+        "sha512": "759bf19e9aa6d5d604c7a6a00f4840ed180bb4b8541b80d3a09c0efef7cc3a057d678953ab98fd7bb94e71174fabd22e8c13cd9411ecc16ab96c32750b021314",
+        "dependencies": []
+      }
+    ],
+    "neoforge-1.21.8": [
+      {
+        "version_id": "T06etL58",
+        "project_id": "YL57xq9U",
+        "version": "1.9.6+1.21.8-neoforge",
+        "game_versions": [
+          "1.21.6",
+          "1.21.7",
+          "1.21.8"
+        ],
+        "loaders": [
+          "neoforge"
+        ],
+        "filename": "iris-neoforge-1.9.6+mc1.21.8.jar",
+        "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/T06etL58/iris-neoforge-1.9.6%2Bmc1.21.8.jar",
+        "sha512": "43f5117f13b6745fead2899df971d009ef5707b33b2a78ea552a853d0cbce0dc0e16bd7f389caff200b34d33656b7a8619fb3faefc0865b7c1dd47abf65b606a",
+        "dependencies": [
+          {
+            "version_id": "lgWRGiHv",
+            "project_id": "AANobbMI",
+            "file_name": null,
+            "dependency_type": "required"
+          }
+        ]
+      },
+      {
+        "version_id": "lgWRGiHv",
+        "project_id": "AANobbMI",
+        "version": "mc1.21.8-0.7.2-neoforge",
+        "game_versions": [
+          "1.21.6",
+          "1.21.7",
+          "1.21.8"
+        ],
+        "loaders": [
+          "neoforge"
+        ],
+        "filename": "sodium-neoforge-0.7.2+mc1.21.8.jar",
+        "url": "https://cdn.modrinth.com/data/AANobbMI/versions/lgWRGiHv/sodium-neoforge-0.7.2%2Bmc1.21.8.jar",
+        "sha512": "601a1da59945655048d66dc9cfc1a2a386c587074e7f707a7c0d9034940a87bf2e628c0b5fab708eaeeaeb01d8b82f5b2cb016f5867e2bf766a1f081ac75ef03",
+        "dependencies": []
+      }
+    ],
+    "neoforge-1.21.11": [
+      {
+        "version_id": "6zJsI0eO",
+        "project_id": "YL57xq9U",
+        "version": "1.10.8+1.21.11-neoforge",
+        "game_versions": [
+          "1.21.11"
+        ],
+        "loaders": [
+          "neoforge"
+        ],
+        "filename": "iris-neoforge-1.10.8+mc1.21.11.jar",
+        "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/6zJsI0eO/iris-neoforge-1.10.8%2Bmc1.21.11.jar",
+        "sha512": "980500d0d35f61efd9c061f7503924c4ddc9667d9ae97eb8f14b250341fd9e58b54a3a4999d8cbaa79cb5929b926e8c515731f809ad7c618f497c1a72ee95309",
+        "dependencies": [
+          {
+            "version_id": "sC6wj32u",
+            "project_id": "AANobbMI",
+            "file_name": null,
+            "dependency_type": "required"
+          }
+        ]
+      },
+      {
+        "version_id": "sC6wj32u",
+        "project_id": "AANobbMI",
+        "version": "mc1.21.11-0.8.14-neoforge",
+        "game_versions": [
+          "1.21.11"
+        ],
+        "loaders": [
+          "neoforge"
+        ],
+        "filename": "sodium-neoforge-0.8.14+mc1.21.11.jar",
+        "url": "https://cdn.modrinth.com/data/AANobbMI/versions/sC6wj32u/sodium-neoforge-0.8.14%2Bmc1.21.11.jar",
+        "sha512": "1699874a8df3da8475fb372306a948690bb76e95221a617c73f6e81d7b70b6fb43ed7b9e8fefc75c5a1607eba33acca56eed374f8a8b753a8397670b43598e35",
+        "dependencies": []
+      }
+    ],
+    "fabric-1.21.5": [
+      {
+        "version_id": "U6evbjd0",
+        "project_id": "YL57xq9U",
+        "version": "1.8.11+1.21.5-fabric",
+        "game_versions": [
+          "1.21.5"
+        ],
+        "loaders": [
+          "fabric",
+          "quilt"
+        ],
+        "filename": "iris-fabric-1.8.11+mc1.21.5.jar",
+        "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/U6evbjd0/iris-fabric-1.8.11%2Bmc1.21.5.jar",
+        "sha512": "f87af0c7fbfa55657b0c0424dc8f20c9c507e4330a69faa83964b9c76f493be5cb19957937de6550ed220449c3c19cb41cbcfc163a12a72b581331d1d8f2958e",
+        "dependencies": [
+          {
+            "version_id": "fVbw1C7i",
+            "project_id": "AANobbMI",
+            "file_name": null,
+            "dependency_type": "required"
+          }
+        ]
+      },
+      {
+        "version_id": "fVbw1C7i",
+        "project_id": "AANobbMI",
+        "version": "mc1.21.5-0.6.12-fabric",
+        "game_versions": [
+          "1.21.5"
+        ],
+        "loaders": [
+          "fabric"
+        ],
+        "filename": "sodium-fabric-0.6.12+mc1.21.5.jar",
+        "url": "https://cdn.modrinth.com/data/AANobbMI/versions/fVbw1C7i/sodium-fabric-0.6.12%2Bmc1.21.5.jar",
+        "sha512": "1a5b4202f4af5db13d0774e3ae16da842a4b460eeedcddd1b15317ec63bf4b38e69e96323b6b9b4360d24c1204cf739dbd7af499284f7d3d0e63bb99cad9e534",
+        "dependencies": []
+      }
+    ],
+    "neoforge-1.21.5": [
+      {
+        "version_id": "KAopiPos",
+        "project_id": "YL57xq9U",
+        "version": "1.8.11+1.21.5-neoforge",
+        "game_versions": [
+          "1.21.5"
+        ],
+        "loaders": [
+          "neoforge"
+        ],
+        "filename": "iris-neoforge-1.8.11+mc1.21.5.jar",
+        "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/KAopiPos/iris-neoforge-1.8.11%2Bmc1.21.5.jar",
+        "sha512": "454194f730538c4722aee4f0d052394d7677610818198b51e7ace67ff2a48083c31d0b816ddf907adb807869cee6827ad7a00feaac60129e3c5fecc92af1d2e3",
+        "dependencies": [
+          {
+            "version_id": "FbKAFCUM",
+            "project_id": "AANobbMI",
+            "file_name": null,
+            "dependency_type": "required"
+          }
+        ]
+      },
+      {
+        "version_id": "FbKAFCUM",
+        "project_id": "AANobbMI",
+        "version": "mc1.21.5-0.6.12-neoforge",
+        "game_versions": [
+          "1.21.5"
+        ],
+        "loaders": [
+          "neoforge"
+        ],
+        "filename": "sodium-neoforge-0.6.12+mc1.21.5.jar",
+        "url": "https://cdn.modrinth.com/data/AANobbMI/versions/FbKAFCUM/sodium-neoforge-0.6.12%2Bmc1.21.5.jar",
+        "sha512": "123ad671fd72d921f195d5ad3ab70df8d6e320b8a0ac3a7087658b0516aa43d8f8293e137b2ad1071ad63385bf6cbe4e6604b50bba1a728c44acdc4fa132d13d",
+        "dependencies": []
+      }
     ]
   },
   "shaderpack": {

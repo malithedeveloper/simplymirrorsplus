@@ -119,7 +119,7 @@ if (stackDirectory.isPresent()) {
     }
     dependencies {
         if (plugins.hasPlugin('net.neoforged.moddev')) runtimeOnly files(jars)
-        else if (stackTarget == 'fabric-26.1.2') runtimeOnly files(jars + nestedMods + nestedLibraries)
+        else if (stackTarget.startsWith('fabric-26.')) runtimeOnly files(jars + nestedMods + nestedLibraries)
         else {
             // Separate file components keep old Fabric Loader classpath groups distinct.
             (jars + nestedMods).each { jar -> modLocalRuntime files(jar) }

@@ -15,10 +15,11 @@ def verify(path, target):
         names = set(jar.namelist())
         assert "pack.mcmeta" in names, "Mod resource pack metadata missing"
         pack = json.loads(jar.read("pack.mcmeta"))["pack"]
-        if target["minecraft"] == "26.1.2":
-            assert pack["min_format"] == 84 and pack["max_format"] == [101, 1], "Modern resource/data pack format range incorrect"
+        ranges = {"1.21.11": (75, [94, 1]), "26.1.2": (84, [101, 1]), "26.2": (88, [107, 1]), "26.3": ([97, 1], 121)}
+        if target["minecraft"] in ranges:
+            assert (pack["min_format"], pack["max_format"]) == ranges[target["minecraft"]], "Modern resource/data pack format range incorrect"
         else:
-            assert pack["pack_format"] == {"1.16.5": 6, "1.20.1": 15, "1.21.1": 34, "1.21.4": 46}[target["minecraft"]]
+            assert pack["pack_format"] == {"1.16.5": 6, "1.20.1": 15, "1.21.1": 34, "1.21.4": 46, "1.21.5": 55, "1.21.8": 64}[target["minecraft"]]
         assert "LICENSE" in names, "License missing"
         assert "NOTICE" in names, "Copyright notice missing"
         assert b"MIT License" in jar.read("LICENSE"), "MIT license missing"
@@ -36,7 +37,7 @@ def verify(path, target):
             png = jar.read(f"assets/simplymirrorsplus/{resource}")
             assert png[:8] == b"\x89PNG\r\n\x1a\n", f"Invalid PNG: {resource}"
             assert struct.unpack(">II", png[16:24]) == size, f"Incorrect asset size: {resource}"
-        singular = target["minecraft"] in ["1.21.1", "1.21.4", "26.1.2"]
+        singular = target["minecraft"] in ["1.21.1", "1.21.4", "1.21.5", "1.21.8", "1.21.11", "26.1.2", "26.2", "26.3"]
         folder = "recipe" if singular else "recipes"
         recipe = json.loads(jar.read(f"data/simplymirrorsplus/{folder}/mirror.json"))
         assert recipe["result"].get("id", recipe["result"].get("item")) == "simplymirrorsplus:mirror"

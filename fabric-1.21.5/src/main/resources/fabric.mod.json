@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "simplymirrorsplus",
+  "version": "${version}",
+  "name": "Simply Mirrors Plus",
+  "description": "Craftable full-block frameless mirrors with live reflections on all six faces, mirror-in-mirror rendering, per-mirror modes and in-game settings. Based on Simply Mirrors by NsTut, maintained by malidev.",
+  "authors": [
+    "NsTut"
+  ],
+  "contributors": [
+    "malidev"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "contact": {
+    "sources": "https://github.com/malithedeveloper/simplymirrorsplus",
+    "issues": "https://github.com/malithedeveloper/simplymirrorsplus/issues"
+  },
+  "entrypoints": {
+    "main": [
+      "com.malidev.simplymirrorsplus.fabric.SimplyMirrorsPlusFabric"
+    ],
+    "modmenu": [
+      "com.malidev.simplymirrorsplus.fabric.ModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "1.21.5",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "mixins": [
+    "simplymirrorsplus.mixins.json"
+  ],
+  "icon": "assets/simplymirrorsplus/icon.png"
+}

@@ -1,0 +1,26 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+issueTrackerURL = "https://github.com/malithedeveloper/simplymirrorsplus/issues"
+[[mods]]
+modId = "simplymirrorsplus"
+version = "${version}"
+displayName = "Simply Mirrors Plus"
+logoFile = "assets/simplymirrorsplus/icon.png"
+authors = "NsTut, malidev"
+description = "Craftable full-block frameless mirrors with live reflections on all six faces, mirror-in-mirror rendering, per-mirror modes and in-game settings. Based on Simply Mirrors by NsTut, maintained by malidev."
+[[dependencies.simplymirrorsplus]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.5.101,)"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.simplymirrorsplus]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.5]"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "simplymirrorsplus.mixins.json"

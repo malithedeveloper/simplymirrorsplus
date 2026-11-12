@@ -16,6 +16,8 @@ import static org.lwjgl.opengl.GL33.*;
 /** Projectively samples the reflection at its screen-space location, retaining the world's depth test. */
 public final class GlMirrorComposite implements AutoCloseable {
     private int program, vao, vbo;
+    /** Set for renderers where near maps to the top of the depth range (Minecraft 26.2+). */
+    public boolean reversedDepth;
     /** Persistent direct staging allocation: grow only when an unusually fragmented scene needs it. */
     private FloatBuffer staging;
     private final double[] corners=new double[12];
@@ -91,7 +93,8 @@ public final class GlMirrorComposite implements AutoCloseable {
         boolean samplers=org.lwjgl.opengl.GL.getCapabilities().OpenGL33||org.lwjgl.opengl.GL.getCapabilities().GL_ARB_sampler_objects;
         int oldSampler=samplers?glGetInteger(GL_SAMPLER_BINDING):0;
         if(samplers)glBindSampler(0,0);
-        boolean depth=glIsEnabled(GL_DEPTH_TEST),cull=glIsEnabled(GL_CULL_FACE),blend=glIsEnabled(GL_BLEND);
+        // 26.2 leaves a scissor rectangle enabled after rendering the world.
+        boolean depth=glIsEnabled(GL_DEPTH_TEST),cull=glIsEnabled(GL_CULL_FACE),blend=glIsEnabled(GL_BLEND),scissor=glIsEnabled(GL_SCISSOR_TEST);
         boolean depthMask=glGetBoolean(GL_DEPTH_WRITEMASK);int depthFunc=glGetInteger(GL_DEPTH_FUNC);
         try {
             FloatBuffer vertices=vertices(Math.multiplyExact(surfaces.size(),42),persistent);
@@ -104,21 +107,21 @@ public final class GlMirrorComposite implements AutoCloseable {
                     double cy=viewProjection[1]*x+viewProjection[5]*y+viewProjection[9]*z+viewProjection[13];
                     double cz=viewProjection[2]*x+viewProjection[6]*y+viewProjection[10]*z+viewProjection[14];
                     double cw=viewProjection[3]*x+viewProjection[7]*y+viewProjection[11]*z+viewProjection[15];
-                    vertices.put((float)cx).put((float)cy).put((float)(cz-cw*.00001)).put((float)cw);
+                    vertices.put((float)cx).put((float)cy).put((float)(reversedDepth?cz+cw*.00001:cz-cw*.00001)).put((float)cw);
                     double sx=corners[at]-captureX,sy=corners[at+1]-captureY,sz=corners[at+2]-captureZ;
                     vertices.put(capture[0]*(float)sx+capture[4]*(float)sy+capture[8]*(float)sz+capture[12]);
                     vertices.put(capture[1]*(float)sx+capture[5]*(float)sy+capture[9]*(float)sz+capture[13]);
                     vertices.put(capture[3]*(float)sx+capture[7]*(float)sy+capture[11]*(float)sz+capture[15]);
                 }
             }
-            vertices.flip();glEnable(GL_DEPTH_TEST);glDepthFunc(GL_LEQUAL);glDepthMask(false);glDisable(GL_CULL_FACE);glDisable(GL_BLEND);
+            vertices.flip();glEnable(GL_DEPTH_TEST);glDepthFunc(reversedDepth?GL_GEQUAL:GL_LEQUAL);glDepthMask(false);glDisable(GL_CULL_FACE);glDisable(GL_BLEND);glDisable(GL_SCISSOR_TEST);
             glUseProgram(program);glUniform1i(glGetUniformLocation(program,"Reflection"),0);
             glBindTexture(GL_TEXTURE_2D,texture);glBindVertexArray(vao);glBindBuffer(GL_ARRAY_BUFFER,vbo);glBufferData(GL_ARRAY_BUFFER,vertices,GL_STREAM_DRAW);
             glDrawArrays(GL_TRIANGLES,0,Math.multiplyExact(surfaces.size(),6));
         } finally {
             glBindBuffer(GL_ARRAY_BUFFER,oldBuffer);glBindVertexArray(oldVao);glUseProgram(oldProgram);
             glBindTexture(GL_TEXTURE_2D,oldTexture);if(samplers)glBindSampler(0,oldSampler);glActiveTexture(oldActive);glDepthMask(depthMask);glDepthFunc(depthFunc);
-            set(GL_DEPTH_TEST,depth);set(GL_CULL_FACE,cull);set(GL_BLEND,blend);
+            set(GL_DEPTH_TEST,depth);set(GL_CULL_FACE,cull);set(GL_BLEND,blend);set(GL_SCISSOR_TEST,scissor);
         }
     }
     private static void set(int state,boolean enabled) { if(enabled)glEnable(state);else glDisable(state); }

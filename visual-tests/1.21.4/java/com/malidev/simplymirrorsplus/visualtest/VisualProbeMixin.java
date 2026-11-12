@@ -58,24 +58,24 @@ public abstract class VisualProbeMixin {
         if(requested<0)return;
         if(requested==6) { simplymirrorsplus$done=true;mc.stop();return; }
         if(requested!=simplymirrorsplus$scene) {
-            simplymirrorsplus$scene=requested;simplymirrorsplus$mirrorFrames=0;simplymirrorsplus$sceneFrames=0;simplymirrorsplus$startPasses=MirrorRenderer.completedPasses;simplymirrorsplus$captured=false;simplymirrorsplus$measureStart=0;
+            simplymirrorsplus$scene=requested;simplymirrorsplus$mirrorFrames=0;simplymirrorsplus$sceneFrames=0;simplymirrorsplus$startPasses=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses;simplymirrorsplus$captured=false;simplymirrorsplus$measureStart=0;
             if(requested>=10)simplymirrorsplus$applyFeature(root);
         }
         simplymirrorsplus$sceneFrames++;
-        if(MirrorRenderer.completedPasses>simplymirrorsplus$startPasses)simplymirrorsplus$mirrorFrames++;
+        if(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses>simplymirrorsplus$startPasses)simplymirrorsplus$mirrorFrames++;
         if(requested>=10) { simplymirrorsplus$featureFrame(mc,root,requested);return; }
         int phase=simplymirrorsplus$mirrorFrames/20;
         float base=VisualScene.pitch(requested);
         simplymirrorsplus$pose(mc,VisualScene.eye(requested),VisualScene.yaw(requested)+(phase==1?20:phase==2?-20:0),base+(phase==3?(base>0?-20:20):phase==4?(base<0?20:-20):0));
         if(simplymirrorsplus$captured)return;
-        if((MirrorRenderer.completedPasses-simplymirrorsplus$startPasses<120||simplymirrorsplus$mirrorFrames<120)&&simplymirrorsplus$sceneFrames<1800)return;
+        if((com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$startPasses<120||simplymirrorsplus$mirrorFrames<120)&&simplymirrorsplus$sceneFrames<1800)return;
         boolean tab=false;
         for(CreativeModeTab t:BuiltInRegistries.CREATIVE_MODE_TAB)if(t!=null&&t.getDisplayName().getString().equals("Simply Mirrors Plus"))tab=true;
         int error=glGetError();
         Path dir=root.resolve("visual-evidence");
         Files.createDirectories(dir);
         VisualCapture.save(mc.getMainRenderTarget().getColorTextureId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+requested+".png"));
-        String json="{\"passes\":"+(MirrorRenderer.completedPasses-simplymirrorsplus$startPasses)+",\"angleFrames\":"+simplymirrorsplus$mirrorFrames+",\"glError\":"+error+",\"creativeTab\":"+tab+"}";
+        String json="{\"passes\":"+(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$startPasses)+",\"angleFrames\":"+simplymirrorsplus$mirrorFrames+",\"glError\":"+error+",\"creativeTab\":"+tab+"}";
         Files.write(dir.resolve("result-"+requested+".json"),json.getBytes(StandardCharsets.UTF_8));
         simplymirrorsplus$captured=true;
     }
@@ -98,11 +98,12 @@ public abstract class VisualProbeMixin {
         float yaw=Float.parseFloat(p.getProperty("yaw"))+Float.parseFloat(p.getProperty("spin","0"))*(float)Math.sin(simplymirrorsplus$sceneFrames*.25);
         simplymirrorsplus$pose(mc,new double[]{Double.parseDouble(p.getProperty("x")),Double.parseDouble(p.getProperty("y")),Double.parseDouble(p.getProperty("z"))},yaw,Float.parseFloat(p.getProperty("pitch","0")));
         if(Boolean.parseBoolean(p.getProperty("menu","false"))) { simplymirrorsplus$menu(mc,root,scene);return; }
+        if(Boolean.parseBoolean(p.getProperty("use","false"))) simplymirrorsplus$sneakUse(mc);
         if(simplymirrorsplus$captured||simplymirrorsplus$sceneFrames<SETTLE_FRAMES)return;
         long now=System.nanoTime();
         if(simplymirrorsplus$measureStart==0) {
             while(glGetError()!=GL_NO_ERROR) { }
-            simplymirrorsplus$measureStart=now;simplymirrorsplus$measurePasses=MirrorRenderer.completedPasses;simplymirrorsplus$measureFrames=0;
+            simplymirrorsplus$measureStart=now;simplymirrorsplus$measurePasses=com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses;simplymirrorsplus$measureFrames=0;
             return;
         }
         simplymirrorsplus$measureFrames++;
@@ -112,9 +113,21 @@ public abstract class VisualProbeMixin {
         Path dir=root.resolve("visual-evidence");
         Files.createDirectories(dir);
         VisualCapture.save(mc.getMainRenderTarget().getColorTextureId(),mc.getMainRenderTarget().width,mc.getMainRenderTarget().height,dir.resolve("mirror-"+scene+".png"));
-        String json="{\"reflectionsPerSecond\":"+(MirrorRenderer.completedPasses-simplymirrorsplus$measurePasses)/seconds+",\"framesPerSecond\":"+simplymirrorsplus$measureFrames/seconds+",\"glError\":"+error+"}";
+        String json="{\"reflectionsPerSecond\":"+(com.malidev.simplymirrorsplus.client.MirrorEngine.completedPasses-simplymirrorsplus$measurePasses)/seconds+",\"framesPerSecond\":"+simplymirrorsplus$measureFrames/seconds+",\"glError\":"+error+"}";
         Files.write(dir.resolve("result-"+scene+".json"),json.getBytes(StandardCharsets.UTF_8));
         simplymirrorsplus$captured=true;
+    }
+
+    /** Sneak and right-click the middle of mirror A through the real interaction packets. */
+    @Unique private void simplymirrorsplus$sneakUse(Minecraft mc) {
+        if(simplymirrorsplus$sceneFrames==SETTLE_FRAMES/3)
+            mc.getConnection().send(new net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket(mc.player,net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY));
+        if(simplymirrorsplus$sceneFrames==SETTLE_FRAMES/2) {
+            net.minecraft.core.BlockPos pos=new net.minecraft.core.BlockPos(0,66,0);
+            mc.gameMode.useItemOn(mc.player,net.minecraft.world.InteractionHand.MAIN_HAND,
+                new net.minecraft.world.phys.BlockHitResult(new net.minecraft.world.phys.Vec3(.5,66.5,0),net.minecraft.core.Direction.NORTH,pos,false));
+            mc.getConnection().send(new net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket(mc.player,net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY));
+        }
     }
 
     /** Drives the real settings screen with mouse events, then checks the values reached the config file. */

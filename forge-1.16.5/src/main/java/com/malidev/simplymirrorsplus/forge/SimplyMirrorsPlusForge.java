@@ -21,9 +21,11 @@ public final class SimplyMirrorsPlusForge {
     public static final CreativeModeTab TAB = new CreativeModeTab("simplymirrorsplus") { @Override public ItemStack makeIcon() { return new ItemStack(SimplyMirrorsPlusForge.MIRROR_ITEM.get()); } };
     public static final RegistryObject<BlockItem> MIRROR_ITEM = ITEMS.register("mirror", () -> new BlockItem(MIRROR.get(), new Item.Properties().tab(TAB)));
     public static final RegistryObject<BlockEntityType<MirrorBlockEntity>> MIRROR_ENTITY = ENTITIES.register("mirror", () -> BlockEntityType.Builder.of(MirrorBlockEntity::new, MIRROR.get()).build(null));
-    public SimplyMirrorsPlusForge() { net.minecraftforge.eventbus.api.IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    public SimplyMirrorsPlusForge() {
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist.isClient()) SimplyMirrorsPlusForgeClient.register();
+        net.minecraftforge.eventbus.api.IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         MirrorContent.blockEntityType = () -> MIRROR_ENTITY.get();
-        BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus); 
+        BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus);
         SimplyMirrorsPlus.initialize();
     }
 }

@@ -1,0 +1,31 @@
+package com.malidev.simplymirrorsplus.fabric;
+import com.malidev.simplymirrorsplus.SimplyMirrorsPlus;
+import com.malidev.simplymirrorsplus.block.*;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.network.chat.Component;
+
+public final class SimplyMirrorsPlusFabric implements ModInitializer {
+    public static final Block MIRROR = new MirrorBlock(BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id("mirror"))).strength(0.8F).sound(SoundType.METAL));
+    public static final Item MIRROR_ITEM = new BlockItem(MIRROR, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id("mirror"))).useBlockDescriptionPrefix());
+    @Override public void onInitialize() {
+        Registry.register(BuiltInRegistries.BLOCK, id("mirror"), MIRROR);
+        Registry.register(BuiltInRegistries.ITEM, id("mirror"), MIRROR_ITEM);
+        BlockEntityType<MirrorBlockEntity> type = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("mirror"), FabricBlockEntityTypeBuilder.create(MirrorBlockEntity::new, MIRROR).build());
+        MirrorContent.blockEntityType = () -> type;
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, id("main"), net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup.builder()
+            .title(Component.translatable("itemGroup.simplymirrorsplus")).icon(() -> new ItemStack(MIRROR_ITEM))
+            .displayItems((parameters, output) -> output.accept(MIRROR_ITEM)).build());
+        SimplyMirrorsPlus.initialize();
+    }
+    private static Identifier id(String path) { return Identifier.fromNamespaceAndPath(SimplyMirrorsPlus.MOD_ID, path); }
+}

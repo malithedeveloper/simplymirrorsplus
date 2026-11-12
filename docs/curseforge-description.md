@@ -6,8 +6,6 @@ Craft a mirror from eight glass blocks around an iron ingot, or take one from th
 
 Simply Mirrors Plus is based on [Simply Mirrors](https://www.curseforge.com/minecraft/mc-mods/simply-mirrors) by NsTut.
 
-[![Original mod: Simply Mirrors by NsTut](https://raw.githubusercontent.com/malithedeveloper/simplymirrorsplus/1.21.4/docs/curseforge/original-mod.png)](https://www.curseforge.com/minecraft/mc-mods/simply-mirrors)
-
 ![Features](https://raw.githubusercontent.com/malithedeveloper/simplymirrorsplus/1.21.4/docs/curseforge/section-features.png)
 
 ### Mirrors inside mirrors
@@ -18,17 +16,21 @@ A mirror you can see in a reflection reflects too. Two bounces are rendered, and
 
 ### Players Only
 
-Turn this on and mirrors show only players in front of the End sky, like a VRChat mirror. The world is not drawn in the reflection at all.
+Turn this on and mirrors show only players in front of the End sky, like a VRChat mirror. The world is not drawn in the reflection at all. It works for all mirrors from the settings, or for single mirrors with the per-mirror mode below.
 
 ![A mirror in Players Only mode](https://raw.githubusercontent.com/malithedeveloper/simplymirrorsplus/1.21.4/docs/curseforge/players-only.png)
 
+### Per-mirror mode and redstone
+
+Sneak and right-click a mirror with an empty hand to switch it between Normal, Players Only and Off. Every mirror block connected to the one you click switches with it. A mirror block powered by redstone stops reflecting until the power is removed.
+
 ### Lighter reflections
 
-Each mirror keeps its own image and only redraws it at the rate you choose. Between refreshes it reuses the last image, and at most two mirror surfaces refresh in a single frame.
+Each mirror keeps its own image and only redraws it at the rate you choose. Only the part of the screen the mirror covers is rendered, and images of mirrors you have not seen for five seconds are freed. Between refreshes the last image is reused, and at most two mirror surfaces refresh in a single frame.
 
 ![Settings](https://raw.githubusercontent.com/malithedeveloper/simplymirrorsplus/1.21.4/docs/curseforge/section-settings.png)
 
-Press `M` in game to open the settings. You can change the key under Controls. The mirrors stay visible behind the menu, so you see each change as you make it.
+Press `M` in game to open the settings, or use the config button in Mod Menu (Fabric) or the NeoForge and Forge mod lists. You can change the key under Controls. The mirrors stay visible behind the menu, so you see each change as you make it.
 
 ![The Mirror Settings menu](https://raw.githubusercontent.com/malithedeveloper/simplymirrorsplus/1.21.4/docs/curseforge/settings-menu.png)
 
@@ -46,7 +48,10 @@ Settings are saved in `config/simplymirrorsplus.properties`.
 | Minecraft | Loaders |
 | --- | --- |
 | 26.1.2 | Fabric, NeoForge |
-| 1.21.4 | Fabric |
+| 1.21.11 | Fabric, NeoForge |
+| 1.21.8 | Fabric, NeoForge |
+| 1.21.5 | Fabric, NeoForge |
+| 1.21.4 | Fabric, NeoForge |
 | 1.21.1 | Fabric, NeoForge |
 | 1.20.1 | Fabric, Forge |
 | 1.16.5 | Fabric, Forge |
