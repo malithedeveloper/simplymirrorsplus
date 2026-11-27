@@ -447,7 +447,8 @@ public abstract class MirrorRenderer implements MirrorEngine.Platform<RenderTarg
         java.util.Map<String,Object[]> planes=new java.util.LinkedHashMap<String,Object[]>();
         for(MirrorSurface face:engine.surfaces()) {
             String id=frames.get(BlockPos.asLong(face.x,face.y,face.z));
-            if(id==null)continue;
+            // The stepped sides of an outlined block have no edge of their own to frame.
+            if(id==null||face.flattened)continue;
             Object[] plane=planes.get(face.planeKey()+"/"+id);
             if(plane==null)planes.put(face.planeKey()+"/"+id,plane=new Object[]{id,new ArrayList<MirrorSurface>()});
             @SuppressWarnings("unchecked") List<MirrorSurface> faces=(List<MirrorSurface>)plane[1];

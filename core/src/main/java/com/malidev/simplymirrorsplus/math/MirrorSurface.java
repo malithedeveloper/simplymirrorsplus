@@ -13,6 +13,8 @@ public final class MirrorSurface implements MirrorGeometry {
     public final boolean whole;
     /** A point on the plane this surface reflects in. It is the surface's own centre unless the surface was {@link #flattened}. */
     public final double px,py,pz;
+    /** True for a surface that reflects in its block's outer face, not in its own plane: a chiselled bit, or the stepped side of an outlined block. */
+    public final boolean flattened;
     private final String planeKey;
     public MirrorSurface(int x,int y,int z,int nx,int nz) {
         this(x,y,z,nx,0,nz);
@@ -31,6 +33,7 @@ public final class MirrorSurface implements MirrorGeometry {
         double[] u=axis(nx,ny,nz,true),v=axis(nx,ny,nz,false);
         double a=a0+a1-1,b=b0+b1-1,out=.5-depth;
         cx=x+.5+nx*out+a*u[0]+b*v[0];cy=y+.5+ny*out+a*u[1]+b*v[1];cz=z+.5+nz*out+a*u[2]+b*v[2];
+        this.flattened=flattened;
         double behind=flattened?depth:0;
         px=cx+nx*behind;py=cy+ny*behind;pz=cz+nz*behind;
         planeKey=nx+":"+ny+":"+nz+":"+Math.round((nx*px+ny*py+nz*pz)*16);
@@ -39,7 +42,7 @@ public final class MirrorSurface implements MirrorGeometry {
      * The same rectangle, reflecting in the plane of its block's outer face instead of its own. Surfaces at many
      * depths, as chiselled bits have, then share one reflection; each is a little off, by twice its depth.
      */
-    public MirrorSurface flattened() { return depth==0?this:new MirrorSurface(x,y,z,nx,ny,nz,a0,b0,a1,b1,depth,true); }
+    public MirrorSurface flattened() { return new MirrorSurface(x,y,z,nx,ny,nz,a0,b0,a1,b1,depth,true); }
     /** Half of the first (or second) edge direction of a face with this normal; bounds run along these two. */
     public static double[] axis(int nx,int ny,int nz,boolean first) {
         if(first)return new double[]{ny==0?-nz*.5:.5,0,ny==0?nx*.5:0};

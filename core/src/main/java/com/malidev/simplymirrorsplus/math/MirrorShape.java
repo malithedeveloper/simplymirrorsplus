@@ -119,18 +119,34 @@ public enum MirrorShape {
             if(!plate)surfaces.add(rectangle(x,y,z,new double[]{-nx,-ny,-nz},0,span(r,left,right),span(t,bottom,top)));
         }
         if(plate)return surfaces;
-        // A side of the cube that the outline fills from end to end is a flat face, and reflects like one. Where
-        // a curve only touches the side, the strip it leaves there stays plain.
-        boolean fullLeft=true,fullRight=true,fullBottom=true,fullTop=true;
-        for(int i=0;i<SIZE;i++) {
-            fullLeft&=covers(rotation,0,i);fullRight&=covers(rotation,SIZE-1,i);
-            fullBottom&=covers(rotation,i,0);fullTop&=covers(rotation,i,SIZE-1);
+        // The sides follow the outline in steps of a pixel. Each step faces one of four ways, and all steps that
+        // face the same way reflect in the cube's face on that side, so a round block is a mirror all around
+        // without needing a reflection per step.
+        int[] rows=rows(rotation);
+        double[][] ways={{-r[0],-r[1],-r[2]},r,{-t[0],-t[1],-t[2]},t};
+        for(int way=0;way<4;way++) {
+            boolean vertical=way<2;
+            // Walk the lines across the step's direction; a run of pixels with the same edge is one rectangle.
+            for(int line=0;line<SIZE;line++) {
+                int start=-1;
+                for(int at=0;at<=SIZE;at++) {
+                    int column=vertical?line:at,row=vertical?at:line;
+                    boolean edge=at<SIZE&&filled(rows,column,row)&&!filled(rows,column+(way==0?-1:way==1?1:0),row+(way==2?-1:way==3?1:0));
+                    if(edge&&start<0)start=at;
+                    if(!edge&&start>=0) {
+                        // How deep the step lies behind the cube's face on its side.
+                        double depth=(way%2==0?line:SIZE-1-line)/16d;
+                        surfaces.add(rectangle(x,y,z,ways[way],depth,span(n,-.5,.5),span(vertical?t:r,start/16d-.5,at/16d-.5)).flattened());
+                        start=-1;
+                    }
+                }
+            }
         }
-        if(fullLeft)surfaces.add(new MirrorSurface(x,y,z,(int)-r[0],(int)-r[1],(int)-r[2]));
-        if(fullRight)surfaces.add(new MirrorSurface(x,y,z,(int)r[0],(int)r[1],(int)r[2]));
-        if(fullBottom)surfaces.add(new MirrorSurface(x,y,z,(int)-t[0],(int)-t[1],(int)-t[2]));
-        if(fullTop)surfaces.add(new MirrorSurface(x,y,z,(int)t[0],(int)t[1],(int)t[2]));
         return surfaces;
+    }
+
+    private static boolean filled(int[] rows,int column,int row) {
+        return column>=0&&column<SIZE&&row>=0&&row<SIZE&&(rows[row]>>column&1)!=0;
     }
 
     /** True when the pixel belongs to the outline. */

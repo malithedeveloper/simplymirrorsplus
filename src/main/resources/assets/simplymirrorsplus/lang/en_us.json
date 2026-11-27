@@ -6,6 +6,9 @@
   "key.simplymirrorsplus.settings": "Open Mirror Settings",
   "simplymirrorsplus.settings.title": "Mirror Settings",
   "simplymirrorsplus.frame": "Frame: %s",
+  "item.simplymirrorsplus.mirror_wrench": "Mirror Wrench",
+  "simplymirrorsplus.wrench.joins": "Round mirror: joins its neighbours",
+  "simplymirrorsplus.wrench.alone": "Round mirror: stands alone",
   "block.simplymirrorsplus.mirror.slab": "Mirror Slab",
   "block.simplymirrorsplus.mirror.panel": "Mirror Panel",
   "block.simplymirrorsplus.mirror.circle": "Round Mirror",
@@ -27,8 +30,5 @@
   "block.simplymirrorsplus.mirror.ring": "Ring Mirror",
   "block.simplymirrorsplus.mirror.ring_panel": "Ring Mirror Panel",
   "block.simplymirrorsplus.mirror.heart": "Heart Mirror",
-  "block.simplymirrorsplus.mirror.heart_panel": "Heart Mirror Panel",
-  "item.simplymirrorsplus.mirror_wrench": "Mirror Wrench",
-  "simplymirrorsplus.wrench.joins": "Round mirror: joins its neighbours",
-  "simplymirrorsplus.wrench.alone": "Round mirror: stands alone"
+  "block.simplymirrorsplus.mirror.heart_panel": "Heart Mirror Panel"
 }

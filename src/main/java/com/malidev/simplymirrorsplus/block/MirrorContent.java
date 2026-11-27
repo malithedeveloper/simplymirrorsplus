@@ -44,8 +44,9 @@ public final class MirrorContent {
             for (java.lang.reflect.Method method : lookup.getMethods()) {
                 // The method comes in two forms; this is the one that takes a single id, not a list of them.
                 if (!method.getName().equals("addItemToGroup") || method.getParameterCount() != 2 || java.util.List.class.isAssignableFrom(method.getParameterTypes()[1])) continue;
+                // The slab stays out: it is worth half a block, and a chisel trades one for one.
                 for (MirrorBlock.Form form : MirrorBlock.Form.items())
-                    method.invoke(null, "simplymirrorsplus_mirror", net.minecraft.resources.ResourceLocation.tryParse("simplymirrorsplus:" + form.item()));
+                    if (form != MirrorBlock.Form.SLAB) method.invoke(null, "simplymirrorsplus_mirror", net.minecraft.resources.ResourceLocation.tryParse("simplymirrorsplus:" + form.item()));
                 return;
             }
         } catch (ClassNotFoundException absent) {

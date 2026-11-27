@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    "simplymirrorsplus:mirror_slab"
+    "simplymirrorsplus:mirror"
   ],
   "result": {
     "id": "simplymirrorsplus:mirror_panel",

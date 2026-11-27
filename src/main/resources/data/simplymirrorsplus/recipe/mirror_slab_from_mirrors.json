@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "MMM"
+  ],
+  "key": {
+    "M": "simplymirrorsplus:mirror"
+  },
+  "result": {
+    "id": "simplymirrorsplus:mirror_slab",
+    "count": 6
+  }
+}

@@ -27,15 +27,17 @@ Simply Mirrors Plus is based on [Simply Mirrors](https://github.com/UpperMoon0/S
 
 | | |
 | --- | --- |
-| **Mirror.** Eight glass blocks around an iron ingot. | <img src=".github/readme/mirror.png" alt="Mirror recipe" width="260"> |
-| **Forms.** Put a mirror in a stonecutter and pick one. Any form cuts into any other, one for one. | <img src=".github/readme/forms.png" alt="Stonecutter recipes" width="360"> |
+| **Mirror.** Eight glass blocks around an iron ingot make eight mirrors. | <img src=".github/readme/mirror.png" alt="Mirror recipe" width="260"> |
+| **Forms.** Put a mirror in a stonecutter and pick one. Any form cuts into any other, one for one; a slab is half a block, so you get two. | <img src=".github/readme/forms.png" alt="Stonecutter recipes" width="360"> |
 | **Forms by hand.** A single mirror in the crafting grid becomes the next form in the list. | <img src=".github/readme/next-form.png" alt="Crafting the next form" width="170"> |
+| **Slabs by hand.** Three mirrors in a row make six slabs. | <img src=".github/readme/slabs.png" alt="Slab recipe" width="260"> |
+| **Back to a block.** Two slabs on top of each other make a mirror. | <img src=".github/readme/from-slabs.png" alt="Two slabs make a mirror" width="170"> |
 | **Frame.** A mirror and any one block, anywhere in the crafting grid. | <img src=".github/readme/frame.png" alt="Frame recipe" width="210"> |
 | **Mirror Wrench.** Three iron ingots and a glass block. | <img src=".github/readme/wrench.png" alt="Mirror Wrench recipe" width="260"> |
 
 ## Mirrors
 
-- Every side of a mirror block reflects. Mirrors that touch form one surface, on walls, floors and ceilings.
+- Every side of a mirror reflects, in every form: a round mirror block is a mirror all the way around. Mirrors that touch form one surface, on walls, floors and ceilings.
 - A mirror in view is redrawn with every frame of the game.
 - A mirror seen inside a reflection reflects too.
 - A mirror behind a wall, or outside your view, is not drawn at all.
