@@ -86,18 +86,6 @@ For a picture backdrop, press **Choose file** on the picture page, drop picture 
 
 Settings are stored in `config/simplymirrorsplus.properties`. The settings of single mirrors are stored per world in `config/simplymirrorsplus/mirrors/`. Both belong to your game, not to the server.
 
-## Other mods
-
-None of these is required.
-
-| Mod | What happens |
-| --- | --- |
-| Sodium | Works. |
-| Iris with a shader pack | Works. Checked with Complementary Reimagined on 1.21.11. Each mirror surface in view costs one more pass of the shader pack: one mirror wall took the test scene from 99 to 46 frames per second. Shader packs draw one bounce, so a mirror inside a reflection shows its block texture. |
-| Yes Steve Model | Works. Checked with 2.6.5 on Fabric 1.20.1. |
-| Chisels & Bits | Mirrors can be chiselled, and mirror bits reflect. Bits facing the same way share one reflection taken at the block's face, so a deeper bit is slightly off. |
-| Rechiseled, Chisel Reborn | The mirror's forms are registered as one chisel group. |
-
 ## Versions
 
 | Minecraft | Loaders |
