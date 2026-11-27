@@ -1,97 +1,204 @@
+// Builds one target. Stonecutter runs this script once per "<minecraft>-<loader>" project in settings.gradle.kts.
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
 plugins {
-    id 'dev.architectury.loom' version '1.11-SNAPSHOT' apply false
-    id 'architectury-plugin' version '3.4-SNAPSHOT'
-    id 'base'
-}
-architectury { minecraft = '1.21.1' }
-allprojects {
-    group = rootProject.maven_group
-    version = rootProject.mod_version
-    repositories { mavenCentral() }
-}
-def matrix = [
-    'fabric-1.16.5': [mc: '1.16.5', java: 8, loader: 'fabric', loaderVersion: '0.16.14'],
-    'forge-1.16.5': [mc: '1.16.5', java: 8, loader: 'forge', loaderVersion: '1.16.5-36.2.42'],
-    'fabric-1.20.1': [mc: '1.20.1', java: 17, loader: 'fabric', loaderVersion: '0.16.14'],
-    'forge-1.20.1': [mc: '1.20.1', java: 17, loader: 'forge', loaderVersion: '1.20.1-47.4.0'],
-    'fabric-1.21.1': [mc: '1.21.1', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
-    'neoforge-1.21.1': [mc: '1.21.1', java: 21, loader: 'neoforge', loaderVersion: '21.1.228'],
-    'fabric-1.21.4': [mc: '1.21.4', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
-    'neoforge-1.21.4': [mc: '1.21.4', java: 21, loader: 'neoforge', loaderVersion: '21.4.161'],
-    'fabric-1.21.5': [mc: '1.21.5', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
-    'neoforge-1.21.5': [mc: '1.21.5', java: 21, loader: 'neoforge', loaderVersion: '21.5.101'],
-    'fabric-1.21.8': [mc: '1.21.8', java: 21, loader: 'fabric', loaderVersion: '0.17.2'],
-    'neoforge-1.21.8': [mc: '1.21.8', java: 21, loader: 'neoforge', loaderVersion: '21.8.57']
-]
-subprojects { p ->
-    if (p.name == 'common') return
-    def target = matrix[p.name]
-    apply plugin: 'dev.architectury.loom'
-    apply plugin: 'architectury-plugin'
-    apply plugin: 'maven-publish'
-    base { archivesName = "${rootProject.archives_name}-${p.name}" }
-    architectury {
-        platformSetupLoomIde()
-        if (target.loader == 'fabric') fabric()
-        else if (target.loader == 'forge') forge()
-        else neoForge()
-    }
-    loom {
-        silentMojangMappingsLicense()
-        if (target.loader != 'neoforge') mixin { defaultRefmapName = 'simplymirrorsplus.refmap.json' }
-    }
-    dependencies {
-        minecraft "net.minecraft:minecraft:${target.mc}"
-        mappings loom.officialMojangMappings()
-        // The Iris RETURN injection uses MixinExtras @Local; Forge does not
-        // expose its annotation on the default Java compile classpath.
-        compileOnly 'io.github.llamalad7:mixinextras-common:0.4.1'
-        if (target.loader == 'fabric') modImplementation "net.fabricmc:fabric-loader:${target.loaderVersion}"
-        else if (target.loader == 'forge') forge "net.minecraftforge:forge:${target.loaderVersion}"
-        else neoForge "net.neoforged:neoforge:${target.loaderVersion}"
-    }
-    java {
-        toolchain.languageVersion = JavaLanguageVersion.of(target.java)
-        withSourcesJar()
-    }
-    sourceSets.main.java.srcDir rootProject.file('common/src/main/java')
-    sourceSets.main.java.srcDir rootProject.file('common-client/src/main/java')
-    sourceSets.main.java.srcDir rootProject.file("common-${target.mc}/src/main/java")
-    sourceSets.main.resources.srcDir rootProject.file("common-${target.mc}/src/main/resources")
-    sourceSets.main.resources.srcDir rootProject.file("common-assets/src/main/resources")
-    tasks.withType(JavaExec).configureEach {
-        javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(target.java) }
-    }
-    tasks.withType(JavaCompile).configureEach {
-        options.encoding = 'UTF-8'
-        if (target.java >= 9) options.release = target.java
-        else { sourceCompatibility = '1.8'; targetCompatibility = '1.8' }
-    }
-    processResources {
-        inputs.property 'version', project.version
-        if (target.loader == 'neoforge') doLast {
-            def mixinsFile = new File(destinationDir, 'simplymirrorsplus.mixins.json')
-            def json = new groovy.json.JsonSlurper().parse(mixinsFile)
-            json.remove('refmap')
-            mixinsFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(json))
-        }
-        filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
-            expand version: project.version
-        }
-    }
-    tasks.withType(Jar).configureEach { from(rootProject.file('LICENSE')); from(rootProject.file('NOTICE')) }
-    apply from: rootProject.file('tools/visual.gradle')
-    apply from: rootProject.file('tools/shader-runtime.gradle')
-    publishing {
-        publications {
-            mavenJava(MavenPublication) { from components.java }
-        }
-    }
-}
-tasks.register('testAllVersions') {
-    group = 'verification'
-    description = 'Runs version-independent reflection contracts (shared across all targets).'
-    dependsOn ':common:test'
+    id 'dev.kikugie.loom-back-compat' apply false
+    id 'net.neoforged.moddev' version '2.0.148' apply false
 }
 
-tasks.named('build') { dependsOn subprojects.collect { it.tasks.named('build') } }
+def mc = sc.current.version
+def loader = sc.current.project.split('-', 2)[1]
+def at = { String predicate -> sc.current.parsed.matches(predicate) }
+def prop = { String name -> sc.properties.get(name) }
+def modVersion = providers.gradleProperty('mod_version').get()
+def javaVersion = at('>=26.1') ? 25 : at('>=1.20.5') ? 21 : at('>=1.18') ? 17 : at('>=1.17') ? 16 : 8
+
+apply plugin: loader == 'neoforge' ? 'net.neoforged.moddev' : 'dev.kikugie.loom-back-compat'
+
+version = modVersion
+base { archivesName = "simplymirrorsplus-${loader}-${mc}" }
+
+repositories {
+    exclusiveContent {
+        forRepository { maven { url = 'https://maven.terraformersmc.com/releases/' } }
+        filter { includeGroup 'com.terraformersmc' }
+    }
+    // Mod Menu for Minecraft 1.14 was never published to a Maven repository of its own.
+    exclusiveContent {
+        forRepository { maven { url = 'https://api.modrinth.com/maven' } }
+        filter { includeGroup 'maven.modrinth' }
+    }
+}
+
+if (loader == 'neoforge') {
+    neoForge {
+        version = prop('deps.neoforge')
+        mods { simplymirrorsplus { sourceSet sourceSets.main } }
+        runs {
+            client { client() }
+            server { server() }
+        }
+    }
+    // The mod loader before 1.20.5 finds a development mod through this variable; ModDevGradle sets only the newer property.
+    if (at('<1.20.5')) tasks.withType(JavaExec).matching { it.name in ['runClient', 'runServer'] }.configureEach {
+        environment('MOD_CLASSES', (sourceSets.main.output.classesDirs.files + [sourceSets.main.output.resourcesDir])
+            .collect { "simplymirrorsplus%%${it}" }.join(File.pathSeparator))
+    }
+    // NeoForge reads the [[mixins]] table of mods.toml from 1.20.5 on; before that the manifest names the config.
+    if (at('<1.20.5')) tasks.named('jar') {
+        manifest.attributes('MixinConfigs': 'simplymirrorsplus.mixins.json')
+        exclude 'META-INF/MANIFEST.MF'
+    }
+} else {
+    dependencies {
+        minecraft "com.mojang:minecraft:${mc}"
+        loomx.applyMojangMappings()
+        if (loader == 'fabric') {
+            modImplementation "net.fabricmc:fabric-loader:${prop('deps.fabric_loader')}"
+            modImplementation "net.fabricmc.fabric-api:fabric-api:${prop('deps.fabric_api')}"
+            // Only Mod Menu's API is compiled against; some of its releases name dependencies no repository here has.
+            modCompileOnly("${at('<1.15') ? 'maven.modrinth' : 'com.terraformersmc'}:modmenu:${prop('deps.modmenu')}") { transitive = false }
+        } else {
+            forge "net.minecraftforge:forge:${mc}-${prop('deps.forge')}"
+            // Old Forge has no MixinExtras; the one mixin using it targets Oculus and is optional.
+            compileOnly 'io.github.llamalad7:mixinextras-common:0.4.1'
+        }
+    }
+    if (loader == 'forge') loom.forge { mixinConfig 'simplymirrorsplus.mixins.json' }
+}
+
+// The version-independent engine is compiled into every jar.
+sourceSets.main.java.srcDir rootProject.file('core/src/main/java')
+
+java {
+    // No JDK 16 is needed: 17 compiles Minecraft 1.17 code with --release 16.
+    toolchain.languageVersion = JavaLanguageVersion.of(javaVersion == 16 ? 17 : javaVersion)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    if (javaVersion > 8) options.release = javaVersion
+}
+
+// Every compiled class in the two mixin packages is a mixin, so the lists cannot drift from the sources.
+def mixinConfig = tasks.register('mixinConfig') {
+    def classes = tasks.named('compileJava').flatMap { it.destinationDirectory }
+    def output = layout.buildDirectory.file('generated/mixinConfig/simplymirrorsplus.mixins.json')
+    inputs.dir(classes)
+    outputs.file(output)
+    doLast {
+        def list = { String folder, String prefix ->
+            def found = new File(classes.get().asFile, "com/malidev/simplymirrorsplus/client/mixin${folder}").list() ?: []
+            found.findAll { it.endsWith('.class') && !it.contains('$') }.collect { prefix + (it - '.class') }.sort()
+        }
+        // Mixin allows nothing but mixins in its package, so both kinds live under client/mixin: the classes
+        // directly in it load on clients only, those in its common folder also on dedicated servers.
+        def config = [required: true, minVersion: '0.8', package: 'com.malidev.simplymirrorsplus.client.mixin',
+            mixins: list('/common', 'common.'), client: list('', ''), injectors: [defaultRequire: 1]]
+        output.get().asFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(config)) + '\n'
+    }
+}
+
+processResources {
+    def ranges = [min: prop('mc.min'), max: prop('mc.max')]
+    def values = [
+        version       : modVersion,
+        java          : javaVersion,
+        minecraftRange: ranges.min == ranges.max ? ranges.min : ">=${ranges.min} <=${ranges.max}",
+        mavenRange    : ranges.min == ranges.max ? "[${ranges.min}]" : "[${ranges.min},${ranges.max}]",
+        loaderVersion : loader == 'fabric' ? prop('deps.fabric_loader') : prop("deps.${loader}"),
+        // Fabric API was called "fabric" before its 2022 releases.
+        fabricApiId   : sc.properties.getOrNull('deps.fabric_api_id') ?: 'fabric-api',
+        // Unobfuscated Minecraft needs a newer Fabric Loader than the old jars asked for.
+        fabricLoaderMin: at('>=26.1') ? '0.18.6' : '0.16.14',
+        // Forge names its mod loader version after its own major version; NeoForge accepts any.
+        fmlRange      : loader == 'forge' ? "[${prop('deps.forge').split('\\.')[0]},)" : '[1,)',
+        // NeoForge 26.2 shows a warning screen at startup for the old key.
+        logoKey       : at('>=26.2') ? 'iconFile' : 'logoFile',
+        // Minecraft 1.21.9 replaced the single pack format with a range covering resources and data.
+        packFormat    : sc.properties.contains('pack.format') ? "\"pack_format\": ${prop('pack.format')}"
+            : "\"min_format\": ${prop('pack.min')},\n    \"max_format\": ${prop('pack.max')}",
+    ]
+    def legacyNeoForge = loader == 'neoforge' && at('<1.20.5')
+    def legacyData = at('<1.21')
+    def objectIngredients = at('<1.21.2')
+    def itemResult = at('<1.20.5')
+    // Chisels & Bits exists for these versions only; its tag is left out of the others.
+    def chisels = mc in ['1.16.5', '1.17.1', '1.18.2', '1.19.2', '1.19.3', '1.19.4', '1.20.1', '1.20.4', '1.21.1', '1.21.10', '1.21.11', '26.1.2']
+    // Minecraft 26.3 rewrote loot tables: one "condition" with a "type", and "modifier" for functions.
+    def typedLoot = at('>=26.3')
+    // Items keep their extra data in a component from 1.20.5, and the loot function that fills it has another name.
+    def componentLoot = at('>=1.20.5')
+    inputs.properties(values)
+    inputs.property('layout', [legacyNeoForge, legacyData, objectIngredients, itemResult, chisels, typedLoot, componentLoot])
+
+    from(mixinConfig)
+    // Folders that only held files moved to their older names would otherwise be packed empty.
+    includeEmptyDirs = false
+    def metadata = [fabric: 'fabric.mod.json', forge: 'META-INF/mods.toml', neoforge: 'META-INF/neoforge.mods.toml']
+    exclude(metadata.findAll { it.key != loader }.values())
+    filesMatching(metadata.values() + ['pack.mcmeta']) { expand(values) }
+    if (legacyNeoForge) rename('neoforge.mods.toml', 'mods.toml')
+    // Item model definitions only exist from 1.21.4.
+    if (at('<1.21.4')) exclude('assets/*/items/**')
+    // Between 1.21.9 and 1.21.11 no single pack.mcmeta is right for both halves: the resource format is one
+    // that must not name the formats it supports, the data format one that must. Both loaders write the file themselves when it is missing.
+    if (at('>=1.21.9 <26.1')) exclude('pack.mcmeta')
+    if (!chisels) exclude('data/chiselsandbits/**')
+
+    // The sources hold the current data layout; older games get it converted here.
+    eachFile { file ->
+        if (legacyData) file.path = file.path.replace('/recipe/', '/recipes/').replace('/loot_table/', '/loot_tables/').replace('/tags/block/', '/tags/blocks/').replace('/tags/item/', '/tags/items/')
+    }
+    doLast {
+        // A development run has no jar, so it reads the manifest from the resources folder.
+        if (legacyNeoForge) new File(destinationDir, 'META-INF/MANIFEST.MF').text = 'Manifest-Version: 1.0\nMixinConfigs: simplymirrorsplus.mixins.json\n'
+        def data = new File(destinationDir, 'data')
+        if (!data.directory) return
+        data.eachFileRecurse(groovy.io.FileType.FILES) { file ->
+            if (componentLoot && file.parentFile.parentFile.name in ['loot_table', 'loot_tables']) {
+                file.text = file.text.replace('"minecraft:copy_nbt"', '"minecraft:copy_custom_data"')
+            }
+            if (typedLoot && file.parentFile.parentFile.name == 'loot_table') {
+                Closure typed
+                typed = { node ->
+                    if (node instanceof List) return node.collect(typed)
+                    if (!(node instanceof Map)) return node
+                    def out = [:]
+                    node.each { key, value ->
+                        if (key == 'conditions') out.condition = value.size() == 1 ? typed(value[0]) : [type: 'minecraft:all_of', terms: value.collect(typed)]
+                        else if (key == 'functions') out.modifier = value.collect(typed)
+                        else if (key == 'condition' && value instanceof String) out.type = value == 'minecraft:block_state_property' ? 'minecraft:match_block' : value
+                        else if (key == 'function') out.type = value
+                        else out[key] = typed(value)
+                    }
+                    if (out.type == 'minecraft:match_block') {
+                        out.blocks = out.remove('block')
+                        out.state = out.remove('properties')
+                    }
+                    return out
+                }
+                file.text = JsonOutput.prettyPrint(JsonOutput.toJson(typed(new JsonSlurper().parse(file)))) + '\n'
+            }
+            if (!(file.parentFile.name in ['recipe', 'recipes'])) return
+            def recipe = new JsonSlurper().parse(file)
+            if (recipe.type == 'minecraft:stonecutting') {
+                if (objectIngredients) recipe.ingredient = recipe.ingredient.startsWith('#') ? [tag: recipe.ingredient.substring(1)] : [item: recipe.ingredient]
+                // Before 1.20.5 a stonecutter recipe names its result and count side by side.
+                if (itemResult) { recipe.count = recipe.result.count; recipe.result = recipe.result.id }
+                file.text = JsonOutput.prettyPrint(JsonOutput.toJson(recipe)) + '\n'
+                return
+            }
+            if (objectIngredients && recipe.ingredients) recipe.ingredients = recipe.ingredients.collect { [item: it] }
+            if (objectIngredients && recipe.key) recipe.key = recipe.key.collectEntries { [it.key, [item: it.value]] }
+            if (itemResult && recipe.result) recipe.result = [item: recipe.result.id, count: recipe.result.count]
+            file.text = JsonOutput.prettyPrint(JsonOutput.toJson(recipe)) + '\n'
+        }
+    }
+}
+
+tasks.withType(Jar).configureEach {
+    from(rootProject.file('LICENSE'))
+    from(rootProject.file('NOTICE'))
+}

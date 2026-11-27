@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "simplymirrorsplus:mirror_heart_panel"
+  ],
+  "result": {
+    "id": "simplymirrorsplus:mirror",
+    "count": 1
+  }
+}

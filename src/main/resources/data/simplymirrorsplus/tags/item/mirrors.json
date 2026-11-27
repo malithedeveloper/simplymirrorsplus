@@ -1,0 +1,27 @@
+{
+  "values": [
+    "simplymirrorsplus:mirror",
+    "simplymirrorsplus:mirror_slab",
+    "simplymirrorsplus:mirror_panel",
+    "simplymirrorsplus:mirror_circle",
+    "simplymirrorsplus:mirror_circle_panel",
+    "simplymirrorsplus:mirror_half_circle",
+    "simplymirrorsplus:mirror_half_circle_panel",
+    "simplymirrorsplus:mirror_quarter_circle",
+    "simplymirrorsplus:mirror_quarter_circle_panel",
+    "simplymirrorsplus:mirror_inverse_quarter_circle",
+    "simplymirrorsplus:mirror_inverse_quarter_circle_panel",
+    "simplymirrorsplus:mirror_triangle",
+    "simplymirrorsplus:mirror_triangle_panel",
+    "simplymirrorsplus:mirror_diamond",
+    "simplymirrorsplus:mirror_diamond_panel",
+    "simplymirrorsplus:mirror_octagon",
+    "simplymirrorsplus:mirror_octagon_panel",
+    "simplymirrorsplus:mirror_arch",
+    "simplymirrorsplus:mirror_arch_panel",
+    "simplymirrorsplus:mirror_ring",
+    "simplymirrorsplus:mirror_ring_panel",
+    "simplymirrorsplus:mirror_heart",
+    "simplymirrorsplus:mirror_heart_panel"
+  ]
+}

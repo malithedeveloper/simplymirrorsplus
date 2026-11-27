@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "#simplymirrorsplus:mirrors",
+  "result": {
+    "id": "simplymirrorsplus:mirror_half_circle_panel",
+    "count": 1
+  }
+}

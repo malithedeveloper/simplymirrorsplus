@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "simplymirrorsplus:block/mirror",
+    "top": "simplymirrorsplus:block/mirror",
+    "side": "simplymirrorsplus:block/mirror"
+  }
+}

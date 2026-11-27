@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "simplymirrorsplus:mirror_slab"
+  ],
+  "result": {
+    "id": "simplymirrorsplus:mirror_panel",
+    "count": 1
+  }
+}

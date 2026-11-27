@@ -1,56 +1,137 @@
-# Simply Mirrors Plus
+<p align="center">
+  <img src=".github/readme/header.png" alt="Simply Mirrors Plus" width="760">
+</p>
 
-<img src="common-assets/src/main/resources/assets/simplymirrorsplus/icon.png" width="128" alt="Simply Mirrors Plus icon">
+<p align="center">
+  Mirrors that reflect the world live, for Minecraft 1.14.4 to 26.3 on Fabric, Forge and NeoForge.
+</p>
 
-Craftable, frameless, full-block mirrors with live reflections for Minecraft. Every face of the block reflects, and adjacent mirrors form continuous surfaces, including floors and ceilings.
+Simply Mirrors Plus is based on [Simply Mirrors](https://github.com/UpperMoon0/Simply-Mirrors) by NsTut.
 
-Based on [Simply Mirrors](https://github.com/UpperMoon0/Simply-Mirrors) by NsTut. The 1.21.4 port, new features and fixes are by malidev.
+<table>
+  <tr>
+    <td width="50%"><img src=".github/readme/shapes.png" alt="A wall of mirrors in different forms"></td>
+    <td width="50%"><img src=".github/readme/frames.png" alt="Mirrors framed with gold, diamond, redstone, amethyst and emerald blocks"></td>
+  </tr>
+  <tr>
+    <td><img src=".github/readme/backdrops.png" alt="Four Players only mirrors with a gradient, a block, the End sky and a rainbow behind the player"></td>
+    <td><img src=".github/readme/settings.png" alt="The settings screen with its buttons on the left and a live preview on the right"></td>
+  </tr>
+</table>
 
-## Supported versions
+<p align="center">
+  <img src=".github/readme/infinite.png" alt="Two mirror walls facing each other, each reflecting the other" width="100%">
+</p>
 
-| Minecraft | Loaders |
+## Recipes
+
+| | |
 | --- | --- |
-| 26.1.2 | Fabric, NeoForge |
-| 1.21.11 | Fabric, NeoForge |
-| 1.21.8 | Fabric, NeoForge |
-| 1.21.5 | Fabric, NeoForge |
-| 1.21.4 | Fabric, NeoForge |
-| 1.21.1 | Fabric, NeoForge |
-| 1.20.1 | Fabric, Forge |
-| 1.16.5 | Fabric, Forge |
+| **Mirror.** Eight glass blocks around an iron ingot. | <img src=".github/readme/mirror.png" alt="Mirror recipe" width="260"> |
+| **Forms.** Put a mirror in a stonecutter and pick one. Any form cuts into any other, one for one. | <img src=".github/readme/forms.png" alt="Stonecutter recipes" width="360"> |
+| **Forms by hand.** A single mirror in the crafting grid becomes the next form in the list. | <img src=".github/readme/next-form.png" alt="Crafting the next form" width="170"> |
+| **Frame.** A mirror and any one block, anywhere in the crafting grid. | <img src=".github/readme/frame.png" alt="Frame recipe" width="210"> |
+| **Mirror Wrench.** Three iron ingots and a glass block. | <img src=".github/readme/wrench.png" alt="Mirror Wrench recipe" width="260"> |
 
-Every version has the same features.
+## Mirrors
 
-## Installation
+- Every side of a mirror block reflects. Mirrors that touch form one surface, on walls, floors and ceilings.
+- A mirror in view is redrawn with every frame of the game.
+- A mirror seen inside a reflection reflects too.
+- A mirror behind a wall, or outside your view, is not drawn at all.
+- Looking at a mirror does not draw the block outline over it.
+- Mirrors sound like glass and break fast with a pickaxe.
 
-Put the jar for your version in your `mods` folder. Fabric builds also need [Fabric API](https://modrinth.com/mod/fabric-api). Craft a mirror from eight glass blocks around an iron ingot, or take one from the Simply Mirrors Plus creative tab.
+## Forms
 
-## Using mirrors
+There are 23 forms: the full block, a slab, a square panel, and ten outlines (round, half round, quarter round, corner fill, triangle, diamond, octagon, arch, ring, heart). Each outline comes as a solid block and as a thin panel. Each form is its own item.
 
-Sneak and right-click a mirror with an empty hand to switch it between Normal, Players Only and Off. The whole mirror switches: every mirror block connected to the one you click. A mirror block powered by redstone stops reflecting until the power is removed.
+- A shaped mirror sits on the side of the block you click and turns towards the corner you click.
+- Round mirrors join by themselves. Side by side, only the outer corners of the group stay round. Full mirror blocks join them too.
+- Two mirror slabs in one block make a full block and drop as two slabs.
+- A broken mirror drops in its form.
+
+The **Mirror Wrench** turns a mirror's outline a quarter when used on it. Sneak and use it on a round mirror to stop it from joining its neighbours, or to let it join again.
+
+## Frames
+
+A framed mirror shows its frame in the block's own texture: on the placed mirror, on the item in your hand and inventory, and by name in the tooltip. Blocks from other mods work as frames.
+
+Framed mirrors that touch share one frame around all of them. A broken mirror keeps its frame. Cutting a framed mirror into another form removes the frame.
 
 ## Settings
 
-Press `M` in game to open the mirror settings. The key can be changed under Controls. The settings are also behind the config button in Mod Menu (Fabric) and in the NeoForge and Forge mod lists. They are stored in `config/simplymirrorsplus.properties`.
+Press `M`, or sneak and right-click a mirror with an empty hand to open that mirror's page. The key can be changed under Controls. Mod Menu and the Forge and NeoForge mod lists open the same screen.
 
 | Setting | Values |
 | --- | --- |
-| Mirrors | On or off |
-| Resolution | 25% to 100% of the screen, in 5% steps; only the part of the screen the mirror covers is rendered |
-| Reflection FPS | 30, 60, 90 or 120 |
-| Players Only (End Sky) | Reflects only players, over the End sky, in every mirror not set to Off |
+| Mirrors | On or off, for all mirrors |
+| Performance | Low, Medium, High or Max |
+| Players only | Reflect only players, in front of a backdrop |
+| Overwrite default settings | Gives one mirror its own name, mode and backdrop |
+| Mode (one mirror) | Normal, Players only or Off |
+| Backdrop | End sky, a block, a colour, a gradient, a picture or a panorama |
 
-## Rendering
+| Performance | Low | Medium | High | Max |
+| --- | --- | --- | --- | --- |
+| Resolution | 50% | 75% | 100% | 100% |
+| Surfaces redrawn every frame | 2 | 3 | 6 | 12 |
+| Surfaces that keep an image | 8 | 12 | 24 | 48 |
+| Mirrors found within | 48 blocks | 64 blocks | 96 blocks | 160 blocks |
+| Reflections inside a reflection, per frame | 0 | 1 | 3 | 8 |
 
-Mirrors visible inside a reflection also reflect, with two rendered bounces. Deeper bounces reuse the mirror's latest image, so the block texture does not show at the cutoff.
+Surfaces past the per-frame number are redrawn in turn and show their last image meanwhile.
 
-Each mirror plane keeps its own image, cropped to the part of the screen it covers, refreshed at the selected rate and reused between refreshes. At most two planes are refreshed per frame and six are drawn. Images of mirrors that have not been seen for five seconds are freed. Mirrors are found within 32 blocks.
+For a picture backdrop, press **Choose file** on the picture page, drop picture files (PNG or JPEG) on the game window while the settings are open, or put them in `config/simplymirrorsplus/backgrounds/`.
 
-Sodium and Iris are supported. When an Iris shader pack is active, reflections render at 100% resolution and a mirror seen inside a reflection shows its block texture.
+Settings are stored in `config/simplymirrorsplus.properties`. The settings of single mirrors are stored per world in `config/simplymirrorsplus/mirrors/`. Both belong to your game, not to the server.
+
+## Other mods
+
+None of these is required.
+
+| Mod | What happens |
+| --- | --- |
+| Sodium | Works. |
+| Iris with a shader pack | Works. Checked with Complementary Reimagined on 1.21.11. Each mirror surface in view costs one more pass of the shader pack: one mirror wall took the test scene from 99 to 46 frames per second. Shader packs draw one bounce, so a mirror inside a reflection shows its block texture. |
+| Yes Steve Model | Works. Checked with 2.6.5 on Fabric 1.20.1. |
+| Chisels & Bits | Mirrors can be chiselled, and mirror bits reflect. Bits facing the same way share one reflection taken at the block's face, so a deeper bit is slightly off. |
+| Rechiseled, Chisel Reborn | The mirror's forms are registered as one chisel group. |
+
+## Versions
+
+| Minecraft | Loaders |
+| --- | --- |
+| 26.3, 26.2, 26.1.2 | Fabric, NeoForge |
+| 26.1.1, 26.1 | Fabric |
+| 1.21.11, 1.21.10, 1.21.8, 1.21.5, 1.21.4, 1.21.3, 1.21.1 | Fabric, NeoForge |
+| 1.20.6, 1.20.4 | Fabric, NeoForge |
+| 1.20.2 | Fabric |
+| 1.20.1, 1.19.4, 1.19.3, 1.19.2, 1.18.2, 1.17.1, 1.16.5, 1.15.2 | Fabric, Forge |
+| 1.14.4 | Fabric |
+
+Each jar is built for one Minecraft version. The 1.21.10 jars also run on 1.21.9. Fabric builds need [Fabric API](https://modrinth.com/mod/fabric-api).
 
 ## Building
 
-Run `python3 tools/build.py` to build every target; each jar is written to its `<target>/build/libs/` folder. Targets need JDK 8, 17, 21 or 25, depending on the Minecraft version. To build one target, run `python3 tools/build.py --target fabric-1.21.4`.
+All versions build from one source tree. Code that differs between Minecraft versions sits behind [Stonecutter](https://stonecutter.kikugie.dev/) conditions such as `//? if >=1.21 {`.
+
+| Path | Contents |
+| --- | --- |
+| `core/` | The mirror engine, its math and its OpenGL code. Java 8, no Minecraft classes. |
+| `src/` | Everything that touches Minecraft. `fabric/`, `forge/` and `neoforge/` hold the loader entry points. |
+| `tools/shapes.py` | Generates the models, block states, items, recipes and loot of the forms from one mask per outline. |
+| `settings.gradle.kts` | The list of targets. |
+| `stonecutter.properties.toml` | Dependency versions and pack formats per target. |
+
+Gradle needs a Java 25 JDK to run and downloads the JDKs the targets compile with.
+
+```sh
+./gradlew collectJars              # every jar, copied to build/release/
+./gradlew :1.21.4-fabric:build     # one target, in versions/1.21.4-fabric/build/libs/
+```
+
+The sources on disk show one target at a time, 1.21.4 Fabric by default. Run `./gradlew "Set active project to 1.20.1-forge"` to edit against another, and `./gradlew "Reset active project"` before committing.
 
 ## License
 

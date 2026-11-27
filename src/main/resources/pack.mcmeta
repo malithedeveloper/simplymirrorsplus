@@ -1,0 +1,6 @@
+{
+  "pack": {
+    "description": "Simply Mirrors Plus resources",
+    ${packFormat}
+  }
+}

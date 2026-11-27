@@ -1,0 +1,75 @@
+{
+  "type": "rechiseled:chiseling",
+  "overwrite": false,
+  "entries": [
+    {
+      "item": "simplymirrorsplus:mirror"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_slab"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_circle"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_circle_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_half_circle"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_half_circle_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_quarter_circle"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_quarter_circle_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_inverse_quarter_circle"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_inverse_quarter_circle_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_triangle"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_triangle_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_diamond"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_diamond_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_octagon"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_octagon_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_arch"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_arch_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_ring"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_ring_panel"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_heart"
+    },
+    {
+      "item": "simplymirrorsplus:mirror_heart_panel"
+    }
+  ]
+}
