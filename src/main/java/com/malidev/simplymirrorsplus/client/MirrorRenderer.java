@@ -382,13 +382,13 @@ public abstract class MirrorRenderer implements MirrorEngine.Platform<RenderTarg
             glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,glId(into.getDepthTexture()),0);
             if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)throw new IllegalStateException("Mirror backdrop framebuffer incomplete");
             glViewport(0,0,into.width,into.height);
-            backdrop.draw(capture.backdrop,MirrorConfig.pictures(),blockAtlas(),blockSprite(capture.backdrop),viewProjection,capture.frame,into.width,into.height);
+            backdrop.draw(capture.backdrop,MirrorConfig.pictures(),blockAtlas(),blockSprite(capture.backdrop),viewProjection,capture.surface,capture.self.eye,capture.panels);
         } finally {
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER,oldDraw);
         }
         *///?} else {
         into.bindWrite(true);
-        backdrop.draw(capture.backdrop,MirrorConfig.pictures(),blockAtlas(),blockSprite(capture.backdrop),viewProjection,capture.frame,into.width,into.height);
+        backdrop.draw(capture.backdrop,MirrorConfig.pictures(),blockAtlas(),blockSprite(capture.backdrop),viewProjection,capture.surface,capture.self.eye,capture.panels);
         //?}
     }
 

@@ -7,6 +7,7 @@ import com.malidev.simplymirrorsplus.math.MirrorTemporalHistory;
 import com.malidev.simplymirrorsplus.math.ReflectionTransform;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -122,13 +123,16 @@ public final class MirrorEngine<T> {
         public final MirrorTemporalHistory.Pose prior;
         /** Mirrors seen in this reflection; null when they are not rendered (shaders, Players Only). */
         public final Runnable nested;
-        /** Where the mirror sits inside the image, as x0, y0, x1, y1 in its clip space; backdrops are laid out on it. */
-        public final float[] frame;
+        /**
+         * Each mirror on this plane as a whole, as left, bottom, right, top along {@link MirrorSurface#across};
+         * backdrops are laid out on these. Null unless the reflection is Players Only.
+         */
+        public final List<double[]> panels;
         /** What a Players Only reflection of this mirror shows behind the players. */
         public final MirrorBackdrop backdrop;
-        Capture(Pass parent,Pass self,MirrorSurface surface,T into,boolean playersOnly,boolean shaders,float[] perspective,MirrorTemporalHistory.Pose prior,Runnable nested,float[] frame,MirrorBackdrop backdrop) {
+        Capture(Pass parent,Pass self,MirrorSurface surface,T into,boolean playersOnly,boolean shaders,float[] perspective,MirrorTemporalHistory.Pose prior,Runnable nested,List<double[]> panels,MirrorBackdrop backdrop) {
             this.parent=parent;this.self=self;this.surface=surface;this.into=into;this.playersOnly=playersOnly;
-            this.shaders=shaders;this.perspective=perspective;this.prior=prior;this.nested=nested;this.frame=frame;this.backdrop=backdrop;
+            this.shaders=shaders;this.perspective=perspective;this.prior=prior;this.nested=nested;this.panels=panels;this.backdrop=backdrop;
         }
         /** Mirror centre relative to the reflected eye, as ShaderReflection expects it. */
         public double offsetX() { return surface.px-self.eye[0]; }
@@ -203,6 +207,8 @@ public final class MirrorEngine<T> {
     private long nestedNeeded;
     private final double[] corners=new double[12];
     private List<MirrorSurface> cached=new ArrayList<MirrorSurface>();
+    /** How far each mirror reaches on each of its planes, by plane key and mirror; worked out when asked for and dropped with {@link #cached}. */
+    private final Map<String,double[]> extents=new HashMap<String,double[]>();
     private final List<Slot<T>> planes=new ArrayList<Slot<T>>();
     private Pass root;
     private int mainWidth,mainHeight;
@@ -238,7 +244,7 @@ public final class MirrorEngine<T> {
         int thisFrame=frame++;
         final double[] eye=root.eye;
         MirrorConfig.Performance tier=MirrorConfig.performance;
-        if(thisFrame%20==0||tier!=searchedTier) { cached=platform.findSurfaces(eye[0],eye[1],eye[2],tier.chunks);searchedTier=tier; }
+        if(thisFrame%20==0||tier!=searchedTier) { cached=platform.findSurfaces(eye[0],eye[1],eye[2],tier.chunks);searchedTier=tier;extents.clear(); }
         MirrorTemporalHistory.Frame prior=temporal.advance(root.view,root.projection,eye[0],eye[1],eye[2]);
         if(nestedUsed>0)nestedNeeded=now;
         else if(!nested.isEmpty()&&now-nestedNeeded>UNUSED_NANOS)releaseNested();
@@ -282,7 +288,7 @@ public final class MirrorEngine<T> {
                 // An image that is not redrawn every frame needs a margin for the camera to move in.
                 Crop crop=crop(slot.faces,vp,eye,baseWidth,baseHeight,shaders,i>=live);
                 slot.target=fit(slot.target,crop,shaders);
-                capture(context,root,slot.faces.get(0),slot.target,crop,slot.mode==MODE_PLAYERS,slot.id);
+                capture(context,root,slot.faces,slot.target,crop,slot.mode==MODE_PLAYERS,slot.id);
                 slot.capturedViewProjection=flipped(crop.apply(vp));
                 slot.capturedEye=eye.clone();
                 slot.renderedFrame=thisFrame;
@@ -354,7 +360,7 @@ public final class MirrorEngine<T> {
             if(previewTarget!=null)platform.destroyTarget(previewTarget);
             previewTarget=platform.createTarget(crop.width,crop.height);
         }
-        capture(new Frame(projection,context.prior,false),viewer,first,previewTarget,crop,mode==MODE_PLAYERS,previewId);
+        capture(new Frame(projection,context.prior,false),viewer,faces,previewTarget,crop,mode==MODE_PLAYERS,previewId);
         previewFrame=flippedFrame(crop.frame);
     }
 
@@ -393,7 +399,8 @@ public final class MirrorEngine<T> {
         LOGGER.log(Level.SEVERE,"Mirror reflection disabled for this world after a rendering error",exception);
     }
 
-    private void capture(Frame frame,Pass parent,MirrorSurface surface,T into,Crop crop,boolean playersOnly,String id) {
+    private void capture(Frame frame,Pass parent,List<MirrorSurface> faces,T into,Crop crop,boolean playersOnly,String id) {
+        MirrorSurface surface=faces.get(0);
         double[] eye=surface.plane().reflectPoint(parent.eye[0],parent.eye[1],parent.eye[2]);
         float[] view=MirrorMatrices.multiply(parent.view,ReflectionTransform.matrix(surface.nx,surface.ny,surface.nz));
         // Across the image the reflection continues its parent's projection, which may itself be a part of the
@@ -414,7 +421,28 @@ public final class MirrorEngine<T> {
         Runnable nestedMirrors=frame.shaders||playersOnly?null:new Runnable() {
             @Override public void run() { renderMirrorsInReflection(context,self,parentSurface,target); }
         };
-        platform.capture(new Capture<T>(parent,self,surface,into,playersOnly,frame.shaders,self.cull,frame.prior.reflect(surface),nestedMirrors,flippedFrame(crop.frame),MirrorConfig.backdrop(id)));
+        platform.capture(new Capture<T>(parent,self,surface,into,playersOnly,frame.shaders,self.cull,frame.prior.reflect(surface),nestedMirrors,playersOnly?panels(faces):null,MirrorConfig.backdrop(id)));
+    }
+
+    /**
+     * The mirrors these faces belong to, each as the rectangle it takes up on the faces' plane. The rectangle
+     * holds the mirror's faces that are out of view too, so it stays put while the player moves and turns.
+     */
+    private List<double[]> panels(List<MirrorSurface> faces) {
+        List<double[]> panels=new ArrayList<double[]>();
+        for(MirrorSurface face:faces) {
+            String id=platform.mirrorId(face),key=face.planeKey()+"/"+id;
+            double[] extent=extents.get(key);
+            if(extent==null) {
+                extent=new double[]{Double.MAX_VALUE,Double.MAX_VALUE,-Double.MAX_VALUE,-Double.MAX_VALUE};
+                for(MirrorSurface other:cached)if(other.planeKey().equals(face.planeKey())&&platform.mirrorId(other).equals(id))other.extend(extent);
+                // A face that was found after the last search is not in the list yet.
+                face.extend(extent);
+                extents.put(key,extent);
+            }
+            if(!panels.contains(extent))panels.add(extent);
+        }
+        return panels;
     }
 
     /**
@@ -429,7 +457,7 @@ public final class MirrorEngine<T> {
         return out;
     }
 
-    /** The mirror's bounds inside a flipped image. Left and right keep their order, so what is laid out on them is flipped back. */
+    /** The mirror's bounds inside a flipped image. Left and right keep their order, so the preview that is cut out along them is flipped back. */
     private static float[] flippedFrame(float[] frame) { return new float[]{-frame[0],frame[1],-frame[2],frame[3]}; }
 
     /**
@@ -449,7 +477,7 @@ public final class MirrorEngine<T> {
                 Crop crop=crop(group.faces,vp,self.eye,platform.width(into),platform.height(into),false,false);
                 T image=fit(nested.get(index),crop,false);
                 nested.set(index,image);
-                capture(frame,self,group.faces.get(0),image,crop,group.mode==MODE_PLAYERS,group.id);
+                capture(frame,self,group.faces,image,crop,group.mode==MODE_PLAYERS,group.id);
                 source=image;
                 sourceViewProjection=flipped(crop.apply(vp));
             } else {
@@ -610,6 +638,7 @@ public final class MirrorEngine<T> {
     public void release() {
         releaseTargets();
         cached=new ArrayList<MirrorSurface>();
+        extents.clear();
         lastLevel=null;
         frame=0;
         failed=false;

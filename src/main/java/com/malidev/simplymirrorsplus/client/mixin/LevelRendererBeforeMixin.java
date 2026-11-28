@@ -14,9 +14,12 @@ import net.minecraft.client.renderer.GameRenderer;
 
 /**
  * Draws the reflections before the player's own view. Minimap and waypoint mods remember the camera of the last
- * world render in a frame, so that render has to be the player's; the high priority puts this ahead of their hooks.
+ * world render in a frame, so that render has to be the player's. Hooks at the head of a method run in order of
+ * rising priority, so the low one puts this ahead of other mods' hooks there. Iris needs that too: it prepares its
+ * frame at the head of renderLevel and drops it at the return, and a reflection drawn after the head would drop
+ * the frame of the player's view with its own.
  */
-@Mixin(value=LevelRenderer.class,priority=1500)
+@Mixin(value=LevelRenderer.class,priority=500)
 public abstract class LevelRendererBeforeMixin {
     //? if >=1.21.9 {
         /*@Inject(method="renderLevel",at=@At("HEAD"))

@@ -48,6 +48,23 @@ public final class MirrorSurface implements MirrorGeometry {
         if(first)return new double[]{ny==0?-nz*.5:.5,0,ny==0?nx*.5:0};
         return new double[]{0,ny==0?.5:0,ny*.5};
     }
+    /**
+     * The direction that is to the right (or up) for someone who looks straight at a face with this normal.
+     * A floor or a ceiling has no upright, so north is up for it.
+     */
+    public static double[] across(int nx,int ny,int nz,boolean right) {
+        if(right)return new double[]{ny==0?nz:ny,0,ny==0?-nx:0};
+        return new double[]{0,ny==0?1:0,ny==0?0:-1};
+    }
+    /** Widens left, bottom, right, top, measured along {@link #across}, until they hold this surface. */
+    public void extend(double[] extent) {
+        double[] right=across(nx,ny,nz,true),up=across(nx,ny,nz,false),c=new double[12];
+        writeCorners(c);
+        for(int i=0;i<12;i+=3) {
+            double a=c[i]*right[0]+c[i+1]*right[1]+c[i+2]*right[2],b=c[i]*up[0]+c[i+1]*up[1]+c[i+2]*up[2];
+            extent[0]=Math.min(extent[0],a);extent[1]=Math.min(extent[1],b);extent[2]=Math.max(extent[2],a);extent[3]=Math.max(extent[3],b);
+        }
+    }
     public static MirrorSurface[] faces(int x,int y,int z) {
         return new MirrorSurface[]{new MirrorSurface(x,y,z,0,0,-1),new MirrorSurface(x,y,z,0,0,1),
             new MirrorSurface(x,y,z,-1,0,0),new MirrorSurface(x,y,z,1,0,0),

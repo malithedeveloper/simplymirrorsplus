@@ -59,7 +59,11 @@ public enum MirrorShape {
     }
 
     /** The outline's rows from the bottom up, one bit per pixel, as seen from the front. */
-    private int[] rows(int rotation) { return rotated(MirrorShapeMasks.ROWS[mask],rotation); }
+    private int[] rows(int rotation) {
+        // A round mirror is never turned: its joined forms name their square corners by where they are, and
+        // their models stand as they are whatever turn the block was placed with.
+        return rotated(MirrorShapeMasks.ROWS[mask],round()?0:rotation);
+    }
 
     /**
      * The outline as rectangles of pixels: left, bottom, right, top, as seen from the front. Equal runs on

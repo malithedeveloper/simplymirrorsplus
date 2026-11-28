@@ -7,33 +7,39 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import com.malidev.simplymirrorsplus.math.MirrorSurface;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.GL33.*;
 
 /**
  * Fills what is behind the players in a Players Only reflection. It is drawn after them, at the far plane,
- * so it lands only on pixels nothing else covered and needs no hook into the game's own sky code.
+ * so it lands only on pixels nothing else covered and needs no hook into the game's own sky code. It is drawn
+ * as one rectangle on each mirror, a little larger than the mirror, which fixes it to the mirror in the world.
  */
 public final class GlMirrorBackdrop {
     private static final Logger LOGGER=Logger.getLogger("simplymirrorsplus");
-    private static final String VERTEX="#version 150\nin vec2 Position;uniform float Far;out vec2 vNdc;void main(){vNdc=Position;gl_Position=vec4(Position,Far,1.);}";
+    // The depth is set by hand: the mirror lies on the reflection's near plane, and the backdrop belongs behind everything.
+    private static final String VERTEX="#version 150\nin vec3 Position;in vec2 Tile,Place;uniform mat4 Project;uniform float Far;out vec2 vTile,vPlace;out vec4 vClip;"
+        +"void main(){vec4 p=Project*vec4(Position,1.);vTile=Tile;vPlace=Place;vClip=p;gl_Position=vec4(p.xy,Far*p.w,p.w);}";
     private static final String FRAGMENT="#version 150\n"
-        +"uniform sampler2D Image;uniform vec4 Sprite;uniform mat4 Unproject;uniform int Kind,Motion,Radial;uniform vec3 Color,Color2;uniform vec2 Fit;uniform vec4 Frame;uniform float Angle,Time;in vec2 vNdc;out vec4 FragColor;\n"
+        +"uniform sampler2D Image;uniform vec4 Sprite;uniform mat4 Unproject;uniform int Kind,Motion,Radial;uniform vec3 Color,Color2;uniform vec2 Fit;uniform float Angle,Time;in vec2 vTile,vPlace;in vec4 vClip;out vec4 FragColor;\n"
         // The view has no translation, so the difference of two unprojected depths is the world direction of the pixel.
-        +"vec3 direction(){vec4 a=Unproject*vec4(vNdc,-.5,1.),b=Unproject*vec4(vNdc,.5,1.);return normalize(b.xyz/b.w-a.xyz/a.w);}\n"
+        +"vec3 direction(){vec2 n=vClip.xy/vClip.w;vec4 a=Unproject*vec4(n,-.5,1.),b=Unproject*vec4(n,.5,1.);return normalize(b.xyz/b.w-a.xyz/a.w);}\n"
         // The game's own sky box: one tiled texture on the six faces of a cube around the camera.
         +"vec2 box(vec3 d){vec3 a=abs(d);return a.x>=a.y&&a.x>=a.z?d.zy/a.x:a.y>=a.z?d.xz/a.y:d.xy/a.z;}\n"
         +"vec3 hue(float h){return clamp(abs(fract(h+vec3(0.,2./3.,1./3.))*6.-3.)-1.,0.,1.);}\n"
         +"void main(){vec3 c;\n"
-        // Pictures and gradients are laid out on the mirror, not on the image, which is larger and moves with the player.
-        +"vec2 m=(vNdc-(Frame.xy+Frame.zw)*.5)/((Frame.zw-Frame.xy)*.5);\n"
+        // Blocks, pictures and gradients are laid out on the mirror itself, from -1 to 1 across it, so they
+        // stay where they are when the player moves. Only the panorama is a view into the distance.
+        +"vec2 m=vPlace;\n"
         +"if(Kind==0)c=texture(Image,box(direction())*8.).rgb*Color;\n"
-        // A room of one block: its texture repeats on the same cube, picked out of the block atlas.
-        +"else if(Kind==1)c=texture(Image,mix(Sprite.xy,Sprite.zw,fract(box(direction())*4.+.5))).rgb*Color;\n"
+        // A wall of one block behind the glass: its texture, picked out of the block atlas, once on every block of the mirror.
+        +"else if(Kind==1){vec2 t=fract(vTile);c=texture(Image,mix(Sprite.xy,Sprite.zw,vec2(t.x,1.-t.y))).rgb*Color;}\n"
         +"else if(Kind==2)c=Color;\n"
         +"else if(Kind==3){float a=Angle+(Motion==2?Time*6.2831853:0.);\n"
         +"float t=Radial==1?length(m*Fit)*.75:dot(m,vec2(cos(a),sin(a)))*.5+.5;\n"
@@ -43,6 +49,8 @@ public final class GlMirrorBackdrop {
         +"else if(Kind==4)c=texture(Image,vec2(m.x,-m.y)/Fit*.5+.5).rgb;\n"
         +"else{vec3 d=direction();c=texture(Image,vec2(atan(d.z,d.x)*.15915494+.5,acos(clamp(d.y,-1.,1.))*.31830989)).rgb;}\n"
         +"FragColor=vec4(c,1.);}";
+    /** How far a backdrop reaches past its mirror, in blocks, so that the image's smoothed border never shows an edge. */
+    private static final double MARGIN=.25;
 
     private static final class Picture {
         final int texture,width,height;
@@ -50,18 +58,21 @@ public final class GlMirrorBackdrop {
     }
 
     private final Map<String,Picture> pictures=new HashMap<String,Picture>();
+    private final float[] vertices=new float[28];
     private int program,vao,vbo,sampler;
     public boolean reversedDepth;
 
     /**
      * Draws into the bound framebuffer, which must have the reflection's depth attached.
-     * @param viewProjection the reflection's projection times its view, column-major
-     * @param frame the mirror's bounds inside the image, in clip space
+     * @param viewProjection the reflection's projection times its view, column-major; the view has no translation
+     * @param surface a face of the mirror, for its plane
+     * @param eye the reflection's camera
+     * @param panels the mirrors to fill, each as left, bottom, right, top along {@link MirrorSurface#across}
      * @param folder where custom pictures are looked up
      * @param atlas the game's block atlas texture, and {@code sprite} the place of the backdrop's block in it as
      *        u0, v0, u1, v1; null when the backdrop is not a block or the block is unknown
      */
-    public void draw(MirrorBackdrop backdrop,java.nio.file.Path folder,int atlas,float[] sprite,float[] viewProjection,float[] frame,int width,int height) {
+    public void draw(MirrorBackdrop backdrop,java.nio.file.Path folder,int atlas,float[] sprite,float[] viewProjection,MirrorSurface surface,double[] eye,List<double[]> panels) {
         if(program==0)initialize();
         MirrorBackdrop.Kind kind=backdrop.kind;
         boolean block=kind==MirrorBackdrop.Kind.BLOCK&&sprite!=null&&atlas!=0;
@@ -76,8 +87,10 @@ public final class GlMirrorBackdrop {
         if(samplers&&block&&sampler==0) { sampler=glGenSamplers();glSamplerParameteri(sampler,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glSamplerParameteri(sampler,GL_TEXTURE_MAG_FILTER,GL_NEAREST); }
         if(samplers)glBindSampler(0,block?sampler:0);
         boolean depth=glIsEnabled(GL_DEPTH_TEST),cull=glIsEnabled(GL_CULL_FACE),blend=glIsEnabled(GL_BLEND),scissor=glIsEnabled(GL_SCISSOR_TEST);
-        boolean depthMask=glGetBoolean(GL_DEPTH_WRITEMASK);int depthFunc=glGetInteger(GL_DEPTH_FUNC);
+        boolean depthMask=glGetBoolean(GL_DEPTH_WRITEMASK),clamp=glIsEnabled(GL_DEPTH_CLAMP);int depthFunc=glGetInteger(GL_DEPTH_FUNC);
         try {
+            // Exactly on the far plane a rounding error would clip the backdrop away; clamping keeps it.
+            glEnable(GL_DEPTH_CLAMP);
             glEnable(GL_DEPTH_TEST);glDepthFunc(reversedDepth?GL_GEQUAL:GL_LEQUAL);glDepthMask(false);glDisable(GL_CULL_FACE);glDisable(GL_BLEND);glDisable(GL_SCISSOR_TEST);
             glUseProgram(program);
             glUniform1i(glGetUniformLocation(program,"Image"),0);
@@ -89,26 +102,42 @@ public final class GlMirrorBackdrop {
             glUniform1f(glGetUniformLocation(program,"Time"),(float)(System.nanoTime()/6e10*backdrop.speed%1.0));
             // Reversed depth runs from 1 at the camera to 0 at the far plane.
             glUniform1f(glGetUniformLocation(program,"Far"),reversedDepth?0f:1f);
-            glUniform4f(glGetUniformLocation(program,"Frame"),frame[0],frame[1],frame[2],frame[3]);
+            glUniformMatrix4fv(glGetUniformLocation(program,"Project"),false,viewProjection);
             glUniformMatrix4fv(glGetUniformLocation(program,"Unproject"),false,com.malidev.simplymirrorsplus.math.MirrorMatrices.inverse(viewProjection));
             float tint=kind==MirrorBackdrop.Kind.END?40/255f:.85f;
             if(block)glUniform4f(glGetUniformLocation(program,"Sprite"),sprite[0],sprite[1],sprite[2],sprite[3]);
             if(kind==MirrorBackdrop.Kind.COLOR||kind==MirrorBackdrop.Kind.GRADIENT)color("Color",backdrop.color);
             else glUniform3f(glGetUniformLocation(program,"Color"),tint,tint,tint);
             color("Color2",backdrop.color2);
-            // The mirror's size on screen, so pictures keep their proportions and round gradients stay round.
-            float mirror=Math.abs((frame[2]-frame[0])*width)/Math.max(1e-3f,Math.abs((frame[3]-frame[1])*height));
-            float own=picture==null?1:(float)picture.width/picture.height;
-            if(kind==MirrorBackdrop.Kind.GRADIENT)glUniform2f(glGetUniformLocation(program,"Fit"),mirror>1?mirror:1,mirror>1?1:1/mirror);
-            // Cover the mirror without stretching: the longer side of the picture is cropped.
-            else glUniform2f(glGetUniformLocation(program,"Fit"),mirror>own?1:own/mirror,mirror>own?mirror/own:1);
             if(block)glBindTexture(GL_TEXTURE_2D,atlas);
             else if(picture!=null)glBindTexture(GL_TEXTURE_2D,picture.texture);
-            glBindVertexArray(vao);
-            glDrawArrays(GL_TRIANGLES,0,3);
+            glBindVertexArray(vao);glBindBuffer(GL_ARRAY_BUFFER,vbo);
+            double[] right=MirrorSurface.across(surface.nx,surface.ny,surface.nz,true),up=MirrorSurface.across(surface.nx,surface.ny,surface.nz,false);
+            double out=surface.nx*surface.px+surface.ny*surface.py+surface.nz*surface.pz;
+            float own=picture==null?1:(float)picture.width/picture.height;
+            for(double[] panel:panels) {
+                double wide=panel[2]-panel[0],high=panel[3]-panel[1];
+                if(wide<=0||high<=0)continue;
+                // The mirror's own proportions, so round gradients stay round and pictures are not stretched.
+                float mirror=(float)(wide/high);
+                if(kind==MirrorBackdrop.Kind.GRADIENT)glUniform2f(glGetUniformLocation(program,"Fit"),mirror>1?mirror:1,mirror>1?1:1/mirror);
+                // Cover the mirror without stretching: the longer side of the picture is cropped.
+                else glUniform2f(glGetUniformLocation(program,"Fit"),mirror>own?1:own/mirror,mirror>own?mirror/own:1);
+                // Block textures are counted from a whole block so they line up with the blocks of the world.
+                double left=Math.floor(panel[0]),bottom=Math.floor(panel[1]);
+                for(int corner=0;corner<4;corner++) {
+                    double a=corner%2==0?panel[0]-MARGIN:panel[2]+MARGIN,b=corner<2?panel[1]-MARGIN:panel[3]+MARGIN;
+                    int at=corner*7;
+                    for(int axis=0;axis<3;axis++)vertices[at+axis]=(float)((axis==0?surface.nx:axis==1?surface.ny:surface.nz)*out+right[axis]*a+up[axis]*b-eye[axis]);
+                    vertices[at+3]=(float)(a-left);vertices[at+4]=(float)(b-bottom);
+                    vertices[at+5]=(float)((a-panel[0])/wide*2-1);vertices[at+6]=(float)((b-panel[1])/high*2-1);
+                }
+                glBufferData(GL_ARRAY_BUFFER,vertices,GL_STREAM_DRAW);
+                glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+            }
         } finally {
             glBindBuffer(GL_ARRAY_BUFFER,oldBuffer);glBindVertexArray(oldVao);glUseProgram(oldProgram);
-            glBindTexture(GL_TEXTURE_2D,oldTexture);if(samplers)glBindSampler(0,oldSampler);glActiveTexture(oldActive);glDepthMask(depthMask);glDepthFunc(depthFunc);
+            glBindTexture(GL_TEXTURE_2D,oldTexture);if(samplers)glBindSampler(0,oldSampler);glActiveTexture(oldActive);glDepthMask(depthMask);glDepthFunc(depthFunc);set(GL_DEPTH_CLAMP,clamp);
             set(GL_DEPTH_TEST,depth);set(GL_CULL_FACE,cull);set(GL_BLEND,blend);set(GL_SCISSOR_TEST,scissor);
         }
     }
@@ -199,16 +228,17 @@ public final class GlMirrorBackdrop {
         int vertex=shader(GL_VERTEX_SHADER,VERTEX),fragment=shader(GL_FRAGMENT_SHADER,FRAGMENT);
         program=glCreateProgram();
         glAttachShader(program,vertex);glAttachShader(program,fragment);
-        glBindAttribLocation(program,0,"Position");
+        glBindAttribLocation(program,0,"Position");glBindAttribLocation(program,1,"Tile");glBindAttribLocation(program,2,"Place");
         glLinkProgram(program);
         glDeleteShader(vertex);glDeleteShader(fragment);
         if(glGetProgrami(program,GL_LINK_STATUS)==GL_FALSE)throw new IllegalStateException("Mirror backdrop shader: "+glGetProgramInfoLog(program));
         int oldVao=glGetInteger(GL_VERTEX_ARRAY_BINDING),oldBuffer=glGetInteger(GL_ARRAY_BUFFER_BINDING);
         vao=glGenVertexArrays();vbo=glGenBuffers();
         glBindVertexArray(vao);glBindBuffer(GL_ARRAY_BUFFER,vbo);
-        // One triangle that covers the whole image.
-        glBufferData(GL_ARRAY_BUFFER,new float[]{-1,-1,3,-1,-1,3},GL_STATIC_DRAW);
-        glVertexAttribPointer(0,2,GL_FLOAT,false,8,0L);glEnableVertexAttribArray(0);
+        // A corner is its place in the world from the eye, in blocks along the mirror, and from -1 to 1 across the mirror.
+        glVertexAttribPointer(0,3,GL_FLOAT,false,28,0L);glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1,2,GL_FLOAT,false,28,12L);glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2,2,GL_FLOAT,false,28,20L);glEnableVertexAttribArray(2);
         glBindBuffer(GL_ARRAY_BUFFER,oldBuffer);glBindVertexArray(oldVao);
     }
 
